@@ -75,7 +75,7 @@ export default function App() {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
   }, [messages, isTyping]);
 
-  const toggleTool = (id: number) => setExpandedTools((p) => ({ ...p, [id]: !p[id] }));
+  const toggleTool = React.useCallback((id: number) => setExpandedTools((p) => ({ ...p, [id]: !p[id] })), []);
 
   const handleSend = (override?: string) => {
     const text = override || inputText;
@@ -180,22 +180,22 @@ export default function App() {
     setTimeout(() => setFabExpanded(true), 250);
   };
 
-  const handleApprove = (msg: Message) => {
+  const handleApprove = React.useCallback((msg: Message) => {
     setMessages((p) => p.filter((m) => m.id !== msg.id).concat([{ id: Date.now(), role: "user", content: "Approved. Proceed." }]));
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
       setMessages((p) => [...p, { id: Date.now() + 1, role: "agent", content: "Deployment initiated. ✓" }]);
     }, 900);
-  };
-  const handleReject = (msg: Message) => {
+  }, []);
+  const handleReject = React.useCallback((msg: Message) => {
     setMessages((p) => p.filter((m) => m.id !== msg.id).concat([{ id: Date.now(), role: "user", content: "Let's review first." }]));
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
       setMessages((p) => [...p, { id: Date.now() + 1, role: "agent", content: "Pausing deployment. What should we review?" }]);
     }, 900);
-  };
+  }, []);
 
   const openConvo = (c: any) => {
     setActiveConvo(c);
@@ -300,7 +300,7 @@ export default function App() {
                     {messages.map((m) =>
                       m.role === "user"
                         ? <UserBubble key={m.id} msg={m} />
-                        : <AgentBubble key={m.id} msg={m} expandedTools={expandedTools} toggleTool={toggleTool} onApprove={handleApprove} onReject={handleReject} />,
+                        : <AgentBubble key={m.id} msg={m} isToolExpanded={!!expandedTools[m.id]} toggleTool={toggleTool} onApprove={handleApprove} onReject={handleReject} />,
                     )}
                     {isTyping && <TypingMessage />}
                   </View>
