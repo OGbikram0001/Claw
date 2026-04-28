@@ -22,4 +22,10 @@ config.cacheStores = [
 // Reduce the number of workers to decrease resource usage
 config.maxWorkers = 2;
 
+// Bind dev server to 0.0.0.0 so the Replit proxy can reach it
+config.server = {
+  ...(config.server || {}),
+  host: '0.0.0.0',
+};
+
 module.exports = config;
