@@ -11,7 +11,7 @@ import {
   StatusBar,
   Dimensions,
 } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -23,6 +23,7 @@ import Animated, {
 import { LinearGradient } from "expo-linear-gradient";
 
 import { T } from "../src/theme";
+import { L } from "../src/layout";
 import { CONVOS, MOCK_CHATS, INITIAL_BG_TASKS, BgTask, Message } from "../src/data/mock";
 import { Ic, GlassPill, AmbientBlob } from "../src/primitives";
 import Header from "../src/Header";
@@ -30,10 +31,11 @@ import BottomBar from "../src/BottomBar";
 import { ChatsView, SpacesView, FilesView, Sidebar, ProcessesPopover, ChatMenuPopover } from "../src/Views";
 import { AgentBubble, UserBubble, TypingMessage } from "../src/Bubbles";
 
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
+const { width: SCREEN_W } = Dimensions.get("window");
 const PHONE_WIDTH = Math.min(SCREEN_W, 440);
 
 export default function App() {
+  const insets = useSafeAreaInsets();
   const [view, setView] = useState<"home" | "chat">("home");
   const [activeTab, setActiveTab] = useState<"chats" | "spaces" | "files">("chats");
   const [activeConvo, setActiveConvo] = useState<any>(null);
@@ -251,7 +253,7 @@ export default function App() {
           {isProcessesOpen && view === "home" && (
             <>
               <TouchableOpacity activeOpacity={1} onPress={() => setIsProcessesOpen(false)} style={[StyleSheet.absoluteFillObject, { zIndex: 90 }]} />
-              <View style={{ position: "absolute", top: 72, right: 20, zIndex: 100 }}>
+              <View style={{ position: "absolute", top: 72, right: L.gutter, zIndex: 100 }}>
                 <ProcessesPopover tasks={bgTasks} />
               </View>
             </>
@@ -259,7 +261,7 @@ export default function App() {
           {isChatMenuOpen && view === "chat" && (
             <>
               <TouchableOpacity activeOpacity={1} onPress={() => setIsChatMenuOpen(false)} style={[StyleSheet.absoluteFillObject, { zIndex: 90 }]} />
-              <View style={{ position: "absolute", top: 72, right: 20, zIndex: 100 }}>
+              <View style={{ position: "absolute", top: 72, right: L.gutter, zIndex: 100 }}>
                 <ChatMenuPopover />
               </View>
             </>
@@ -293,10 +295,14 @@ export default function App() {
               >
                 <ScrollView
                   ref={scrollRef}
-                  contentContainerStyle={{ paddingTop: 90, paddingBottom: 100, paddingHorizontal: 16 }}
+                  contentContainerStyle={{
+                    paddingTop: L.screenTopPadding,
+                    paddingBottom: L.screenBottomPadding,
+                    paddingHorizontal: L.gutter,
+                  }}
                   showsVerticalScrollIndicator={false}
                 >
-                  <View style={{ gap: 8 }}>
+                  <View style={{ gap: 10 }}>
                     {messages.map((m) =>
                       m.role === "user"
                         ? <UserBubble key={m.id} msg={m} />
@@ -307,7 +313,7 @@ export default function App() {
                 </ScrollView>
 
                 {/* Floating chat input (no background behind it) */}
-                <View style={chatStyles.inputArea}>
+                <View style={[chatStyles.inputArea, { bottom: Math.max(L.floatingBarBottomOffset, insets.bottom + 10), left: L.gutter, right: L.gutter }]}>
                   <GlassPill rounded={28} style={{ flex: 1, height: 56, borderColor: T.amber + "44" }}>
                     <View style={chatStyles.inputRow}>
                       <TouchableOpacity style={chatStyles.iconBtn}>
@@ -352,7 +358,7 @@ const styles = StyleSheet.create({
 });
 
 const chatStyles = StyleSheet.create({
-  inputArea: { position: "absolute", bottom: 24, left: 20, right: 20, height: 56, flexDirection: "row" },
+  inputArea: { position: "absolute", height: L.floatingBarHeight, flexDirection: "row" },
   inputRow: { flex: 1, flexDirection: "row", alignItems: "center", paddingHorizontal: 6, gap: 4 },
   iconBtn: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
 });

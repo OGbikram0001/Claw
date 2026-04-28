@@ -4,6 +4,7 @@ import Animated, { FadeIn, FadeInDown, SlideInLeft } from "react-native-reanimat
 import { LinearGradient } from "expo-linear-gradient";
 import { GlassPill, Ic, Logo, CircularProgress, StatusDot } from "./primitives";
 import { T } from "./theme";
+import { L } from "./layout";
 import { CONVOS, SPACES, FOLDERS, FILES, BgTask } from "./data/mock";
 
 /* ─── DROPDOWN POPOVER (glass) ─── */
@@ -73,7 +74,7 @@ const sideStyles = StyleSheet.create({
 /* ─── CHATS TAB ─── */
 export function ChatsView({ onOpen }: { onOpen: (c: any) => void }) {
   return (
-    <ScrollView contentContainerStyle={{ paddingTop: 90, paddingBottom: 110 }} showsVerticalScrollIndicator={false}>
+    <ScrollView contentContainerStyle={{ paddingTop: L.screenTopPadding, paddingBottom: L.screenBottomPadding }} showsVerticalScrollIndicator={false}>
       <Text style={common.sectionLabel}>Active Agents</Text>
       {CONVOS.map((c, i) => (
         <Animated.View key={c.id} entering={FadeInDown.delay(i * 60)}>
@@ -106,9 +107,9 @@ export function ChatsView({ onOpen }: { onOpen: (c: any) => void }) {
 /* ─── SPACES TAB ─── */
 export function SpacesView() {
   return (
-    <ScrollView contentContainerStyle={{ paddingTop: 90, paddingBottom: 110 }} showsVerticalScrollIndicator={false}>
+    <ScrollView contentContainerStyle={{ paddingTop: L.screenTopPadding, paddingBottom: L.screenBottomPadding }} showsVerticalScrollIndicator={false}>
       <Text style={common.sectionLabel}>Your Spaces</Text>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 20, gap: 14 }}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", paddingHorizontal: L.gutter, gap: 14 }}>
         {/* Create card */}
         <View style={[spaceStyles.card, { borderStyle: "dashed", borderColor: "rgba(255,255,255,0.15)", backgroundColor: "transparent", alignItems: "center", justifyContent: "center" }]}>
           <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: "rgba(255,255,255,0.05)", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
@@ -165,8 +166,8 @@ const spaceStyles = StyleSheet.create({
 /* ─── FILES TAB ─── */
 export function FilesView() {
   return (
-    <ScrollView contentContainerStyle={{ paddingTop: 90, paddingBottom: 110 }} showsVerticalScrollIndicator={false}>
-      <View style={{ paddingHorizontal: 20, paddingVertical: 12, flexDirection: "row", alignItems: "center", gap: 14 }}>
+    <ScrollView contentContainerStyle={{ paddingTop: L.screenTopPadding, paddingBottom: L.screenBottomPadding }} showsVerticalScrollIndicator={false}>
+      <View style={{ paddingHorizontal: L.gutter, paddingVertical: 12, flexDirection: "row", alignItems: "center", gap: 14 }}>
         <CircularProgress progress={45} size={50} stroke={4} color={T.blue} />
         <View>
           <Text style={{ color: T.textPri, fontSize: 16, fontWeight: "600" }}>
@@ -176,7 +177,7 @@ export function FilesView() {
         </View>
       </View>
       <Text style={common.sectionLabel}>Folders</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12, paddingBottom: 16 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: L.gutter, gap: 12, paddingBottom: 16 }}>
         {FOLDERS.map((f) => (
           <View key={f.id} style={fileStyles.folder}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 14 }}>
@@ -191,7 +192,7 @@ export function FilesView() {
         ))}
       </ScrollView>
       <Text style={common.sectionLabel}>Recent Files</Text>
-      <View style={{ paddingHorizontal: 20, gap: 10 }}>
+      <View style={{ paddingHorizontal: L.gutter, gap: 10 }}>
         {FILES.map((f, i) => (
           <Animated.View key={f.id} entering={FadeInDown.delay(i * 50)}>
             <TouchableOpacity activeOpacity={0.7} style={fileStyles.row}>
@@ -267,6 +268,6 @@ export function ChatMenuPopover() {
 }
 
 const common = StyleSheet.create({
-  sectionLabel: { paddingHorizontal: 20, paddingVertical: 14, fontSize: 12, color: T.textSec, fontWeight: "600", letterSpacing: 1.4, textTransform: "uppercase" },
-  convoRow: { flexDirection: "row", alignItems: "center", gap: 14, paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: T.border },
+  sectionLabel: { paddingHorizontal: L.gutter, paddingVertical: 14, fontSize: 12, color: T.textSec, fontWeight: "600", letterSpacing: 1.4, textTransform: "uppercase" },
+  convoRow: { flexDirection: "row", alignItems: "center", gap: 14, paddingHorizontal: L.gutter, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: T.border },
 });

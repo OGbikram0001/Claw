@@ -8,6 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { GlassPill, Ic } from "./primitives";
 import { T } from "./theme";
+import { L } from "./layout";
 
 type Props = {
   activeTab: "chats" | "spaces" | "files";
@@ -117,9 +118,9 @@ const iconBtnStyle = {
 
 const styles = StyleSheet.create({
   wrapper: {
-    position: "absolute", bottom: 24, left: 20, right: 20,
+    position: "absolute", bottom: L.floatingBarBottomOffset + 8, left: L.gutter, right: L.gutter,
     flexDirection: "row", gap: 12, alignItems: "center", zIndex: 50,
-    height: 56,
+    height: L.floatingBarHeight,
   },
   navPillContainer: {
     height: 56,

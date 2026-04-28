@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { GlassPill, Ic, CircularProgress, Logo } from "./primitives";
 import { T } from "./theme";
+import { L } from "./layout";
 
 type Props = {
   view: "home" | "chat";
@@ -104,7 +105,7 @@ export default function Header({
 }
 
 const styles = StyleSheet.create({
-  wrapper: { position: "absolute", top: 16, left: 20, right: 20, zIndex: 50 },
+  wrapper: { position: "absolute", top: L.headerTopOffset, left: L.gutter, right: L.gutter, zIndex: 50 },
   row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", height: 56 },
   titleContainer: { position: "absolute", left: 0, right: 0, height: 44, alignItems: "center", justifyContent: "center" },
 });
