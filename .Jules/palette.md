@@ -1,0 +1,3 @@
+## 2024-04-28 - Add accessibility labels to icon-only navigation buttons
+**Learning:** Found an accessibility issue pattern specific to this app's components: Icon-only `TouchableOpacity` buttons in key layout regions (like `Header.tsx` and `BottomBar.tsx`) were missing ARIA roles and labels, which makes the app extremely difficult to use with screen readers since they wouldn't announce the button's action.
+**Action:** Always verify icon-only `TouchableOpacity` instances (particularly in core navigation components) contain `accessibilityRole="button"` and a descriptive `accessibilityLabel`. Use `accessibilityState={{ selected: active }}` for tab navigation buttons.
