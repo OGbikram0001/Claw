@@ -1,0 +1,3 @@
+## 2024-05-18 - React.memo() with Complex Props
+**Learning:** When trying to prevent unnecessary O(N) re-renders in a mapped list (like chat bubbles), using `React.memo()` alone is insufficient if the components receive props that change reference on every keystroke (such as the `expandedTools` object, or inline functions). We must decouple the state to primitive/boolean props (e.g. `isExpanded={!!expandedTools[m.id]}`) and memoize callback functions using `useCallback` to ensure stable references across parent re-renders.
+**Action:** When implementing `React.memo()`, check the stability of all props. Pass primitive values instead of complex objects when possible, and wrap event handlers in `useCallback`.
