@@ -51,7 +51,12 @@ export default function Header({
     <View style={styles.wrapper} pointerEvents="box-none">
       <View style={styles.row}>
         {/* LEFT BUTTON */}
-        <TouchableOpacity activeOpacity={0.85} onPress={view === "home" ? onMenu : onBack}>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={view === "home" ? onMenu : onBack}
+          accessibilityRole="button"
+          accessibilityLabel={view === "home" ? "Open Menu" : "Go Back"}
+        >
           <GlassPill style={{ width: 44, height: 44 }} rounded={22}>
             <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
               <Animated.View style={[StyleSheet.absoluteFillObject, { alignItems: "center", justifyContent: "center" }, menuStyle]}>
@@ -80,18 +85,34 @@ export default function Header({
             <View style={{ height: 44, position: "relative" }}>
               {/* HOME: progress + label */}
               <Animated.View style={[StyleSheet.absoluteFillObject, homePillStyle]} pointerEvents={view === "home" ? "auto" : "none"}>
-                <TouchableOpacity onPress={onProgressTap} activeOpacity={0.85} style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingHorizontal: 12 }}>
+                <TouchableOpacity
+                  onPress={onProgressTap}
+                  activeOpacity={0.85}
+                  style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingHorizontal: 12 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="View overall progress"
+                >
                   <Text style={{ color: T.amber, fontSize: 12, fontWeight: "700", fontFamily: "Courier" }}>{overallProgress}%</Text>
                   <CircularProgress progress={overallProgress} size={26} stroke={3} />
                 </TouchableOpacity>
               </Animated.View>
               {/* CHAT: new + menu */}
               <Animated.View style={[StyleSheet.absoluteFillObject, { flexDirection: "row", alignItems: "center" }, chatPillStyle]} pointerEvents={view === "chat" ? "auto" : "none"}>
-                <TouchableOpacity onPress={onNewChat} style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}>
+                <TouchableOpacity
+                  onPress={onNewChat}
+                  style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Create a new chat session"
+                >
                   <Ic name="create-outline" size={20} color={T.textPri} />
                 </TouchableOpacity>
                 <View style={{ width: 1, height: 22, backgroundColor: "rgba(255,255,255,0.15)" }} />
-                <TouchableOpacity onPress={onChatMenu} style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}>
+                <TouchableOpacity
+                  onPress={onChatMenu}
+                  style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Open chat menu options"
+                >
                   <Ic name="ellipsis-horizontal" size={20} color={T.textPri} />
                 </TouchableOpacity>
               </Animated.View>
