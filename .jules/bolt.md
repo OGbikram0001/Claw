@@ -1,0 +1,3 @@
+## 2024-05-15 - React Native Chat Re-render Bottleneck
+**Learning:** Found a specific bottleneck where keeping real-time keyboard input state (`inputText`) in the same component as the rendered `messages` array without memoizing the chat bubbles causes O(N) re-renders for every keystroke. Due to React Native's architecture, this results in significant UI thread blocking when the chat history grows.
+**Action:** Always extract text input state to a separate component, OR strictly memoize child components (`React.memo`) that render list items. Additionally, be careful not to pass entire object maps as props (like `expandedTools`) to list items when a simple boolean derivation `isExpanded={!!expandedTools[m.id]}` will prevent unnecessary prop invalidation.
