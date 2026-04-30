@@ -44,12 +44,12 @@ export default function BottomBar({
       <View style={[styles.fabContainer, fabExpanded ? styles.fabContainerExpanded : null]}>
         <GlassPill style={[{ width: "100%", height: "100%" }, { borderColor: T.amber + "55" }]} rounded={28}>
           {!fabExpanded ? (
-            <TouchableOpacity activeOpacity={0.8} onPress={() => setFabExpanded(true)} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => setFabExpanded(true)} style={{ flex: 1, alignItems: "center", justifyContent: "center" }} accessibilityLabel="Expand new chat">
               <Ic name="add" size={28} color={T.amber} />
             </TouchableOpacity>
           ) : (
             <View style={{ flexDirection: "row", flex: 1, alignItems: "center", paddingHorizontal: 6, gap: 4 }}>
-              <TouchableOpacity onPress={() => { setFabExpanded(false); setNewChatText(""); }} style={iconBtnStyle}>
+              <TouchableOpacity onPress={() => { setFabExpanded(false); setNewChatText(""); }} style={iconBtnStyle} accessibilityLabel="Close new chat">
                 <Ic name="close" size={20} color={T.textSec} />
               </TouchableOpacity>
               <TextInput
@@ -63,11 +63,11 @@ export default function BottomBar({
                 style={{ flex: 1, color: T.textPri, fontSize: 15, paddingHorizontal: 6, height: "100%" }}
               />
               {newChatText.length > 0 ? (
-                <TouchableOpacity onPress={onSubmit} style={[iconBtnStyle, { backgroundColor: T.amber }]}>
+                <TouchableOpacity onPress={onSubmit} style={[iconBtnStyle, { backgroundColor: T.amber }]} accessibilityLabel="Send message">
                   <Ic name="send" size={16} color="#1A1208" />
                 </TouchableOpacity>
               ) : (
-                <TouchableOpacity style={iconBtnStyle}>
+                <TouchableOpacity style={iconBtnStyle} accessibilityLabel="Voice input">
                   <Ic name="mic" size={20} color={T.amber} />
                 </TouchableOpacity>
               )}
