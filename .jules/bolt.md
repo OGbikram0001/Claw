@@ -1,0 +1,3 @@
+## 2024-05-01 - React Re-render Cascade due to State Co-location
+**Learning:** In the frontend React Native architecture, placing highly frequent state updates (like `inputText` on every keystroke) in the parent `App` component (`frontend/app/index.tsx`) causes cascading re-renders across all complex child components (e.g., `AgentBubble`, `UserBubble`, and markdown parsers) if they are not memoized.
+**Action:** When working on complex list/chat views, either decouple the input state from the parent container or heavily utilize `React.memo` for the list items along with `useCallback` for their prop handlers to preserve reference stability and prevent unnecessary re-renders.
