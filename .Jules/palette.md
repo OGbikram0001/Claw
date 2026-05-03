@@ -1,0 +1,3 @@
+## 2024-05-18 - Missing Accessibility Attributes on Custom Interactive Elements
+**Learning:** Found a recurring pattern in the React Native codebase where custom icon-only components built using `TouchableOpacity` were lacking fundamental accessibility properties (`accessibilityRole="button"` and `accessibilityLabel`). Because these elements wrap pure visual icons without text content, screen readers fail to communicate their purpose to users relying on assistive technologies.
+**Action:** Always ensure that custom button implementations (e.g. `TouchableOpacity` wrapping `Ic` or other SVGs) explicitly provide `accessibilityRole="button"` and a descriptive `accessibilityLabel`.

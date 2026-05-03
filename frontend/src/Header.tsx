@@ -51,7 +51,12 @@ export default function Header({
     <View style={styles.wrapper} pointerEvents="box-none">
       <View style={styles.row}>
         {/* LEFT BUTTON */}
-        <TouchableOpacity activeOpacity={0.85} onPress={view === "home" ? onMenu : onBack}>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={view === "home" ? onMenu : onBack}
+          accessibilityRole="button"
+          accessibilityLabel={view === "home" ? "Open Menu" : "Go Back"}
+        >
           <GlassPill style={{ width: 44, height: 44 }} rounded={22}>
             <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
               <Animated.View style={[StyleSheet.absoluteFillObject, { alignItems: "center", justifyContent: "center" }, menuStyle]}>
@@ -87,11 +92,21 @@ export default function Header({
               </Animated.View>
               {/* CHAT: new + menu */}
               <Animated.View style={[StyleSheet.absoluteFillObject, { flexDirection: "row", alignItems: "center" }, chatPillStyle]} pointerEvents={view === "chat" ? "auto" : "none"}>
-                <TouchableOpacity onPress={onNewChat} style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}>
+                <TouchableOpacity
+                  onPress={onNewChat}
+                  style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}
+                  accessibilityRole="button"
+                  accessibilityLabel="New Chat"
+                >
                   <Ic name="create-outline" size={20} color={T.textPri} />
                 </TouchableOpacity>
                 <View style={{ width: 1, height: 22, backgroundColor: "rgba(255,255,255,0.15)" }} />
-                <TouchableOpacity onPress={onChatMenu} style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}>
+                <TouchableOpacity
+                  onPress={onChatMenu}
+                  style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Chat Menu"
+                >
                   <Ic name="ellipsis-horizontal" size={20} color={T.textPri} />
                 </TouchableOpacity>
               </Animated.View>
