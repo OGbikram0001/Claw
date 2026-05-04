@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Ic, TypingDots } from "./primitives";
@@ -20,7 +20,7 @@ import {
 } from "./blocks";
 import A2UIRenderer from "./A2UIRenderer";
 
-export function UserBubble({ msg }: { msg: any }) {
+export const UserBubble = memo(function UserBubble({ msg }: { msg: any }) {
   return (
     <Animated.View entering={FadeInDown.duration(220)} style={{ flexDirection: "row", justifyContent: "flex-end", marginVertical: 4 }}>
       <View style={{
@@ -37,7 +37,7 @@ export function UserBubble({ msg }: { msg: any }) {
       </View>
     </Animated.View>
   );
-}
+});
 
 export function ApprovalCard({ content, onApprove, onReject }: { content: string; onApprove: () => void; onReject: () => void }) {
   return (
@@ -70,7 +70,7 @@ export function ApprovalCard({ content, onApprove, onReject }: { content: string
   );
 }
 
-export function AgentBubble({
+export const AgentBubble = memo(function AgentBubble({
   msg,
   expandedTools,
   toggleTool,
@@ -134,9 +134,9 @@ export function AgentBubble({
       </View>
     </Animated.View>
   );
-}
+}, (prev, next) => prev.msg === next.msg && prev.expandedTools[next.msg.id] === next.expandedTools[next.msg.id]);
 
-export function TypingMessage() {
+export const TypingMessage = memo(function TypingMessage() {
   return (
     <View style={{ flexDirection: "row", gap: 8, marginVertical: 4 }}>
       <View style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: T.agentBub, borderWidth: 1, borderColor: T.amber + "44", alignItems: "center", justifyContent: "center" }}>
@@ -147,4 +147,4 @@ export function TypingMessage() {
       </View>
     </View>
   );
-}
+});
