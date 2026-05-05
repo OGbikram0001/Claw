@@ -20,7 +20,8 @@ import {
 } from "./blocks";
 import A2UIRenderer from "./A2UIRenderer";
 
-export function UserBubble({ msg }: { msg: any }) {
+// ⚡ Bolt: Memoize component to prevent O(N) re-renders in chat lists when typing.
+export const UserBubble = React.memo(function UserBubble({ msg }: { msg: any }) {
   return (
     <Animated.View entering={FadeInDown.duration(220)} style={{ flexDirection: "row", justifyContent: "flex-end", marginVertical: 4 }}>
       <View style={{
@@ -37,9 +38,10 @@ export function UserBubble({ msg }: { msg: any }) {
       </View>
     </Animated.View>
   );
-}
+});
 
-export function ApprovalCard({ content, onApprove, onReject }: { content: string; onApprove: () => void; onReject: () => void }) {
+// ⚡ Bolt: Memoize component to prevent O(N) re-renders in chat lists when typing.
+export const ApprovalCard = React.memo(function ApprovalCard({ content, onApprove, onReject }: { content: string; onApprove: () => void; onReject: () => void }) {
   return (
     <Animated.View entering={FadeInDown.duration(280)} style={{
       backgroundColor: T.violet + "11",
@@ -68,9 +70,11 @@ export function ApprovalCard({ content, onApprove, onReject }: { content: string
       </View>
     </Animated.View>
   );
-}
+});
 
-export function AgentBubble({
+// ⚡ Bolt: Memoize component to prevent O(N) re-renders in chat lists when typing.
+// Uses custom comparison to only re-render if its own specific tool expands/collapses.
+export const AgentBubble = React.memo(function AgentBubble({
   msg,
   expandedTools,
   toggleTool,
@@ -134,9 +138,18 @@ export function AgentBubble({
       </View>
     </Animated.View>
   );
-}
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.msg === nextProps.msg &&
+    prevProps.toggleTool === nextProps.toggleTool &&
+    prevProps.onApprove === nextProps.onApprove &&
+    prevProps.onReject === nextProps.onReject &&
+    prevProps.expandedTools[prevProps.msg.id] === nextProps.expandedTools[nextProps.msg.id]
+  );
+});
 
-export function TypingMessage() {
+// ⚡ Bolt: Memoize component to prevent O(N) re-renders in chat lists when typing.
+export const TypingMessage = React.memo(function TypingMessage() {
   return (
     <View style={{ flexDirection: "row", gap: 8, marginVertical: 4 }}>
       <View style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: T.agentBub, borderWidth: 1, borderColor: T.amber + "44", alignItems: "center", justifyContent: "center" }}>
@@ -147,4 +160,4 @@ export function TypingMessage() {
       </View>
     </View>
   );
-}
+});
