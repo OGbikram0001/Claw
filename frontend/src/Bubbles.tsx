@@ -20,7 +20,7 @@ import {
 } from "./blocks";
 import A2UIRenderer from "./A2UIRenderer";
 
-export function UserBubble({ msg }: { msg: any }) {
+export const UserBubble = React.memo(function UserBubble({ msg }: { msg: any }) {
   return (
     <Animated.View entering={FadeInDown.duration(220)} style={{ flexDirection: "row", justifyContent: "flex-end", marginVertical: 4 }}>
       <View style={{
@@ -37,7 +37,7 @@ export function UserBubble({ msg }: { msg: any }) {
       </View>
     </Animated.View>
   );
-}
+});
 
 export function ApprovalCard({ content, onApprove, onReject }: { content: string; onApprove: () => void; onReject: () => void }) {
   return (
@@ -70,15 +70,15 @@ export function ApprovalCard({ content, onApprove, onReject }: { content: string
   );
 }
 
-export function AgentBubble({
+export const AgentBubble = React.memo(function AgentBubble({
   msg,
-  expandedTools,
+  expanded,
   toggleTool,
   onApprove,
   onReject,
 }: {
   msg: any;
-  expandedTools: Record<number, boolean>;
+  expanded: boolean;
   toggleTool: (id: number) => void;
   onApprove: (m: any) => void;
   onReject: (m: any) => void;
@@ -86,7 +86,7 @@ export function AgentBubble({
   if (msg.role === "tool") {
     return (
       <View style={{ paddingLeft: 36, marginVertical: 2 }}>
-        <ToolCallBlock msg={msg} expanded={!!expandedTools[msg.id]} onToggle={() => toggleTool(msg.id)} />
+        <ToolCallBlock msg={msg} expanded={expanded} onToggle={() => toggleTool(msg.id)} />
       </View>
     );
   }
@@ -134,9 +134,9 @@ export function AgentBubble({
       </View>
     </Animated.View>
   );
-}
+});
 
-export function TypingMessage() {
+export const TypingMessage = React.memo(function TypingMessage() {
   return (
     <View style={{ flexDirection: "row", gap: 8, marginVertical: 4 }}>
       <View style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: T.agentBub, borderWidth: 1, borderColor: T.amber + "44", alignItems: "center", justifyContent: "center" }}>
@@ -147,4 +147,4 @@ export function TypingMessage() {
       </View>
     </View>
   );
-}
+});

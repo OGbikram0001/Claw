@@ -1,0 +1,3 @@
+## 2024-05-15 - Prevent re-render cascades in chat views
+**Learning:** In complex chat views with co-located state (like high-frequency `inputText` updates alongside expensive message lists), failing to memoize components and provide stable prop references causes the entire list to re-render unnecessarily on every keystroke, leading to significant performance bottlenecks.
+**Action:** Use `React.memo` to memoize message bubble components and `useCallback` for prop handlers to ensure their references remain stable, thereby preserving the reference stability and preventing unnecessary re-render cascades.
