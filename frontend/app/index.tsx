@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -75,7 +75,8 @@ export default function App() {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
   }, [messages, isTyping]);
 
-  const toggleTool = (id: number) => setExpandedTools((p) => ({ ...p, [id]: !p[id] }));
+  // ⚡ Bolt: Stabilize handlers passed to memoized components to prevent re-renders
+  const toggleTool = useCallback((id: number) => setExpandedTools((p) => ({ ...p, [id]: !p[id] })), []);
 
   const handleSend = (override?: string) => {
     const text = override || inputText;
@@ -180,22 +181,24 @@ export default function App() {
     setTimeout(() => setFabExpanded(true), 250);
   };
 
-  const handleApprove = (msg: Message) => {
+  // ⚡ Bolt: Stabilize handlers passed to memoized components to prevent re-renders
+  const handleApprove = useCallback((msg: Message) => {
     setMessages((p) => p.filter((m) => m.id !== msg.id).concat([{ id: Date.now(), role: "user", content: "Approved. Proceed." }]));
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
       setMessages((p) => [...p, { id: Date.now() + 1, role: "agent", content: "Deployment initiated. ✓" }]);
     }, 900);
-  };
-  const handleReject = (msg: Message) => {
+  }, []);
+
+  const handleReject = useCallback((msg: Message) => {
     setMessages((p) => p.filter((m) => m.id !== msg.id).concat([{ id: Date.now(), role: "user", content: "Let's review first." }]));
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
       setMessages((p) => [...p, { id: Date.now() + 1, role: "agent", content: "Pausing deployment. What should we review?" }]);
     }, 900);
-  };
+  }, []);
 
   const openConvo = (c: any) => {
     setActiveConvo(c);
