@@ -361,7 +361,7 @@ export function DeepResearchBlock({ data }: { data: any }) {
         <Text style={{ color: T.violet, fontSize: 10, fontWeight: "600" }}>{data?.sources} sources</Text>
       </View>
       <View style={{ padding: 14 }}>
-        <Text style={{ color: T.textPri, fontSize: 13, marginBottom: 10, fontStyle: "italic" }}>"{data?.query}"</Text>
+        <Text style={{ color: T.textPri, fontSize: 13, marginBottom: 10, fontStyle: "italic" }}>&quot;{data?.query}&quot;</Text>
         <View style={{ gap: 12 }}>
           {(data?.steps || []).map((s: any, i: number) => (
             <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
