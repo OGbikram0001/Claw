@@ -1,0 +1,3 @@
+## 2024-05-08 - Icon-Only Button Accessibility in React Native
+**Learning:** Icon-only buttons implemented using `TouchableOpacity` (or `Pressable`) in React Native do not inherently communicate their purpose or interactive nature to screen readers. Relying solely on visual icons leaves visually impaired users without context.
+**Action:** Always ensure that any custom icon-only components wrapping an icon (like `TouchableOpacity`) explicitly include both `accessibilityRole="button"` and descriptive `accessibilityLabel` attributes for full screen reader accessibility. Include `accessibilityState={{ selected: active }}` for tab-like elements.
