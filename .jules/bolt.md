@@ -1,0 +1,3 @@
+## 2024-05-24 - Prevent React Re-render Cascades in Co-located State Components
+**Learning:** In complex chat/list views (like `App` in React Native), co-locating highly frequent state updates like `inputText` causes the entire parent component and all child components (like `AgentBubble` and `UserBubble` lists) to re-render on every keystroke.
+**Action:** Heavily utilize `React.memo` for list item components (`UserBubble`, `AgentBubble`) and `useCallback` for their prop handlers to preserve reference stability and prevent unnecessary deep re-renders. Avoid passing large objects like `expandedTools` mapping directly; pass a specific boolean prop instead `isToolExpanded={!!expandedTools[m.id]}`.
