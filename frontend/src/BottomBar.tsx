@@ -44,12 +44,12 @@ export default function BottomBar({
       <View style={[styles.fabContainer, fabExpanded ? styles.fabContainerExpanded : null]}>
         <GlassPill style={[{ width: "100%", height: "100%" }, { borderColor: T.amber + "55" }]} rounded={28}>
           {!fabExpanded ? (
-            <TouchableOpacity activeOpacity={0.8} onPress={() => setFabExpanded(true)} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="New Chat" activeOpacity={0.8} onPress={() => setFabExpanded(true)} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
               <Ic name="add" size={28} color={T.amber} />
             </TouchableOpacity>
           ) : (
             <View style={{ flexDirection: "row", flex: 1, alignItems: "center", paddingHorizontal: 6, gap: 4 }}>
-              <TouchableOpacity onPress={() => { setFabExpanded(false); setNewChatText(""); }} style={iconBtnStyle}>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={() => { setFabExpanded(false); setNewChatText(""); }} style={iconBtnStyle}>
                 <Ic name="close" size={20} color={T.textSec} />
               </TouchableOpacity>
               <TextInput
@@ -63,11 +63,11 @@ export default function BottomBar({
                 style={{ flex: 1, color: T.textPri, fontSize: 15, paddingHorizontal: 6, height: "100%" }}
               />
               {newChatText.length > 0 ? (
-                <TouchableOpacity onPress={onSubmit} style={[iconBtnStyle, { backgroundColor: T.amber }]}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Send Message" onPress={onSubmit} style={[iconBtnStyle, { backgroundColor: T.amber }]}>
                   <Ic name="send" size={16} color="#1A1208" />
                 </TouchableOpacity>
               ) : (
-                <TouchableOpacity style={iconBtnStyle}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Voice Input" style={iconBtnStyle}>
                   <Ic name="mic" size={20} color={T.amber} />
                 </TouchableOpacity>
               )}
@@ -91,7 +91,7 @@ function NavBtn({ icon, iconActive, label, active, onPress }: any) {
     marginLeft: t.value * 6,
   }));
   return (
-    <TouchableOpacity activeOpacity={0.85} onPress={onPress}>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel={label} activeOpacity={0.85} onPress={onPress}>
       <Animated.View style={[
         {
           flexDirection: "row", alignItems: "center", height: 40,
