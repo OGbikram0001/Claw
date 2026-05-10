@@ -1,0 +1,4 @@
+## 2024-05-10 - Overly Permissive CORS and Insecure Env Access
+**Vulnerability:** CORS was set to `allow_origins=["*"]`, allowing any website to make cross-origin requests to the API. Environment variables like `MONGO_URL` were accessed directly via `os.environ[]`, which would crash the application on startup if unconfigured.
+**Learning:** Hardcoded wildcard CORS is a high-priority security risk for APIs handling sensitive user status data. Lack of safe defaults for environment variables creates brittle startup flows and potential availability issues.
+**Prevention:** Use environment variables (like `ALLOWED_ORIGINS`) to strictly configure CORS dynamically, defaulting to an empty list `[]` to fail securely. Always use `os.environ.get("KEY", "default")` with safe fallbacks instead of direct dictionary access to avoid application crashes.
