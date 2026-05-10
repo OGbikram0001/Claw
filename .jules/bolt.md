@@ -1,0 +1,3 @@
+## 2024-06-25 - Prevent React re-render cascades in chat views
+**Learning:** Complex list/chat views (like `frontend/app/index.tsx` mapping over messages) can suffer from re-render cascades if the parent component frequently updates state (e.g., `inputText`). Passing large objects directly (like `expandedTools`) exacerbates the issue by causing shallow equality checks to fail for all child items.
+**Action:** Heavily utilize `React.memo` for list item components (like `UserBubble` and `AgentBubble`). Ensure reference stability by wrapping prop handlers with `useCallback` and avoid passing large mapping objects directly as props. Instead, pass specific boolean primitives derived from the object (e.g., `isToolExpanded={!!expandedTools[m.id]}`).
