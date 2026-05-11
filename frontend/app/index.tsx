@@ -1,87 +1,104 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
+  View, Text, ScrollView, StyleSheet, KeyboardAvoidingView, Platform,
   TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  StatusBar,
-  Dimensions,
 } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSpring,
-  Easing,
-  FadeIn,
-} from "react-native-reanimated";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-
 import { T } from "../src/theme";
-import { CONVOS, MOCK_CHATS, INITIAL_BG_TASKS, BgTask, Message } from "../src/data/mock";
-import { Ic, GlassPill, AmbientBlob } from "../src/primitives";
+import { MOCK_CHATS, INITIAL_BG_TASKS, BgTask, Message } from "../src/data/mock";
+import { Ic, StatusDot, ScrollFade, AmbientBlob } from "../src/primitives";
 import Header from "../src/Header";
 import BottomBar from "../src/BottomBar";
-import { ChatsView, SpacesView, FilesView, Sidebar, ProcessesPopover, ChatMenuPopover } from "../src/Views";
+import {
+  HomeView, ChatsView, SpacesView, FilesView,
+  Sidebar, ProcessesPopover, ChatMenuPopover,
+} from "../src/Views";
 import { AgentBubble, UserBubble, TypingMessage } from "../src/Bubbles";
 
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
-const PHONE_WIDTH = Math.min(SCREEN_W, 440);
+type Tab     = "home" | "chats" | "spaces" | "files";
+type AppView = "home" | "chat";
 
 export default function App() {
-  const [view, setView] = useState<"home" | "chat">("home");
-  const [activeTab, setActiveTab] = useState<"chats" | "spaces" | "files">("chats");
+  /* ── Navigation ── */
+  const [activeTab,   setActiveTab]   = useState<Tab>("home");
+  const [appView,     setAppView]     = useState<AppView>("home");
   const [activeConvo, setActiveConvo] = useState<any>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputText, setInputText] = useState("");
-  const [expandedTools, setExpandedTools] = useState<Record<number, boolean>>({ 21: true, 12: true, 32: true });
-  const [isTyping, setIsTyping] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [fabExpanded, setFabExpanded] = useState(false);
-  const [newChatText, setNewChatText] = useState("");
+  /* ── Popovers ── */
+  const [showProcesses, setShowProcesses] = useState(false);
+  const [showChatMenu,  setShowChatMenu]  = useState(false);
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isProcessesOpen, setIsProcessesOpen] = useState(false);
-  const [isChatMenuOpen, setIsChatMenuOpen] = useState(false);
+  /* ── Chat state ── */
+  const [messages,      setMessages]      = useState<Message[]>([]);
+  const [newChatText,   setNewChatText]   = useState("");
+  const [fabExpanded,   setFabExpanded]   = useState(false);
+  const [expandedTools, setExpandedTools] = useState<Record<number, boolean>>({});
+  const [isTyping,      setIsTyping]      = useState(false);
 
+  /* ── Background tasks ── */
   const [bgTasks, setBgTasks] = useState<BgTask[]>(INITIAL_BG_TASKS);
-  const overallProgress = Math.round(bgTasks.reduce((a, t) => a + t.progress, 0) / Math.max(1, bgTasks.length)) || 0;
+  const overall = Math.round(bgTasks.reduce((a, t) => a + t.progress, 0) / Math.max(1, bgTasks.length));
 
   const scrollRef = useRef<ScrollView>(null);
 
-  // bg task increment
+  /* Animate bg task progress */
   useEffect(() => {
     const id = setInterval(() => {
-      setBgTasks((prev) =>
-        prev.map((t) => ({ ...t, progress: t.progress >= 100 ? 0 : Math.min(100, t.progress + Math.floor(Math.random() * 5) + 1) })),
+      setBgTasks(prev =>
+        prev.map(t => ({ ...t, progress: t.progress >= 100 ? 100 : Math.min(100, t.progress + (Math.random() > 0.65 ? 1 : 0)) }))
       );
-    }, 2200);
+    }, 1800);
     return () => clearInterval(id);
   }, []);
 
-  // close menus when view changes
-  useEffect(() => {
-    setIsProcessesOpen(false);
-    setIsChatMenuOpen(false);
-  }, [view]);
-
-  // scroll on new message
+  /* Auto-scroll on new messages */
   useEffect(() => {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
   }, [messages, isTyping]);
 
-  const toggleTool = (id: number) => setExpandedTools((p) => ({ ...p, [id]: !p[id] }));
+  /* ── Actions ── */
+  function openChat(convo: any) {
+    setActiveConvo(convo);
+    setMessages(MOCK_CHATS[convo.id] || []);
+    setExpandedTools({});
+    setIsTyping(false);
+    setAppView("chat");
+    setShowChatMenu(false);
+    setShowProcesses(false);
+    setSidebarOpen(false);
+  }
 
-  const handleSend = (override?: string) => {
-    const text = override || inputText;
-    if (!text.trim()) return;
-    setMessages((p) => [...p, { id: Date.now(), role: "user", content: text }]);
-    if (!override) setInputText("");
+  function newChat() {
+    setActiveConvo(null);
+    setMessages([]);
+    setIsTyping(false);
+    setAppView("chat");
+    setFabExpanded(true);
+    setShowChatMenu(false);
+  }
+
+  function handleBack() {
+    setAppView("home");
+    setShowChatMenu(false);
+    setShowProcesses(false);
+    setFabExpanded(false);
+  }
+
+  function handleSubmit() {
+    const text = newChatText.trim();
+    if (!text) return;
+
+    /* Bootstrap convo if fresh */
+    if (!activeConvo) {
+      setActiveConvo({ id: 0, name: text.slice(0, 40), status: "running" });
+    }
+
+    const userMsg: Message = { id: Date.now(), role: "user", content: text };
+    setMessages(prev => [...prev, userMsg]);
+    setNewChatText("");
+    setFabExpanded(false);
     setIsTyping(true);
 
     const lower = text.toLowerCase();
@@ -90,269 +107,267 @@ export default function App() {
       let resp: Message = { id: Date.now() + 1, role: "agent" };
 
       if (lower.includes("mermaid") || lower.includes("flowchart")) {
-        resp.content = "Here's the mermaid flowchart you requested:";
-        resp.block = { type: "mermaid", code: "flowchart TD\n  A[Start] --> B{Decision}\n  B -->|Yes| C[Path A]\n  B -->|No| D[Path B]\n  C --> E[End]\n  D --> E" };
-      } else if (lower.includes("architecture") || lower.includes("diagram") || lower.includes("connection")) {
+        resp.content = "Here's the rendered flowchart:";
+        resp.block   = { type: "mermaid", code: "flowchart TD\n  A[Start] --> B{Decision}\n  B -->|Yes| C[Path A]\n  B -->|No| D[Path B]\n  C --> E[End]\n  D --> E" };
+      } else if (lower.includes("architecture") || lower.includes("connection") || lower.includes("diagram")) {
         resp.content = "Here is the connection diagram:";
-        resp.block = { type: "connection", nodes: [
-          { label: "Client App", icon: "phone-portrait-outline", color: T.amber },
-          { label: "API Gateway", icon: "git-network-outline", color: T.violet },
-          { label: "Database", icon: "server-outline", color: T.sage },
+        resp.block   = { type: "connection", nodes: [
+          { label: "Client",     icon: "phone-portrait-outline", color: T.amber  },
+          { label: "API Gateway",icon: "git-network-outline",    color: T.violet },
+          { label: "Database",   icon: "server-outline",         color: T.sage   },
         ] };
       } else if (lower.includes("terminal") || lower.includes("sandbox") || lower.includes("run")) {
-        resp.content = "Streaming live terminal output:";
-        resp.block = { type: "terminal", filename: "task.py", code: "result = compute_data()\nprint(f'Done: {result}')", output: "> Booting sandbox...\n> Compiling 142 modules...\n> ✓ Done in 1.4s\n> Result: SUCCESS" };
+        resp.content = "Live sandbox output:";
+        resp.block   = { type: "terminal", filename: "task.py", code: "result = compute()\nprint(f'Done: {result}')", output: "> Booting sandbox...\n> Compiling modules...\n> ✓ Done in 1.4s\n> Result: SUCCESS" };
       } else if (lower.includes("swarm") || lower.includes("agents")) {
-        resp.content = "Initializing the multi-agent swarm:";
-        resp.block = { type: "swarm", agents: [
-          { id: "A-1", role: "Planner", color: T.amber },
-          { id: "B-2", role: "Coder", color: T.violet },
-          { id: "C-3", role: "Review", color: T.sage },
+        resp.content = "Multi-agent swarm initialised:";
+        resp.block   = { type: "swarm", agents: [
+          { id: "A-1", role: "Planner", color: T.amber  },
+          { id: "B-2", role: "Coder",   color: T.violet },
+          { id: "C-3", role: "Review",  color: T.sage   },
         ] };
       } else if (lower.includes("preview") || lower.includes("dashboard")) {
-        resp.content = "I've compiled a live preview:";
-        resp.block = { type: "preview", title: "Generated Dashboard", url: "https://kittyclaw.app/preview", stats: [
-          { label: "Users",  value: "2.3k", color: T.sage },
-          { label: "Errors", value: "0",    color: T.red  },
+        resp.content = "Live preview compiled:";
+        resp.block   = { type: "preview", title: "Generated Dashboard", url: "kittyclaw.app/preview", stats: [
+          { label: "Users",  value: "2.3k", color: T.sage  },
+          { label: "Errors", value: "0",    color: T.red   },
           { label: "Speed",  value: "92ms", color: T.amber },
         ] };
       } else if (lower.includes("research") || lower.includes("deep")) {
-        resp.content = "Running deep research:";
-        resp.block = { type: "deepresearch", query: text, sources: 8, steps: [
-          { label: "Web search", done: true, count: 3 },
-          { label: "Source analysis", done: true, count: 5 },
-          { label: "Synthesis", done: false, count: 0 },
+        resp.content = "Deep research running:";
+        resp.block   = { type: "deepresearch", query: text, sources: 8, steps: [
+          { label: "Web search",      done: true,  count: 3 },
+          { label: "Source analysis", done: true,  count: 5 },
+          { label: "Synthesis",       done: false, count: 0 },
         ] };
       } else if (lower.includes("search") || lower.includes("find")) {
-        resp.content = "Search results:";
-        resp.block = { type: "search", query: text, results: [
-          { title: "Top match", url: "example.com/a", snippet: "Most relevant result.", color: T.amber },
-          { title: "Related",   url: "example.com/b", snippet: "Useful adjacent content.", color: T.violet },
+        resp.content = "Top results:";
+        resp.block   = { type: "search", query: text, results: [
+          { title: "Best match", url: "example.com/a", snippet: "Most relevant result for your query.", color: T.amber  },
+          { title: "Related",   url: "example.com/b", snippet: "Adjacent useful content.",             color: T.violet },
         ] };
       } else if (lower.includes("browser") || lower.includes("web")) {
-        resp.content = "Opening a browser session:";
-        resp.block = { type: "browser", url: "https://example.com", title: "Example Page", actions: [
-          { label: "Navigate", done: true },
+        resp.content = "Browser session opened:";
+        resp.block   = { type: "browser", url: "https://example.com", title: "Example Page", actions: [
+          { label: "Navigate",       done: true  },
           { label: "Extract content", done: false },
         ] };
       } else if (lower.includes("automation") || lower.includes("workflow") || lower.includes("pipeline")) {
-        resp.content = "Designing automation pipeline:";
-        resp.block = { type: "automation", steps: [
-          { label: "Trigger", icon: "flash-outline", status: "done" },
+        resp.content = "Automation pipeline:";
+        resp.block   = { type: "automation", steps: [
+          { label: "Trigger", icon: "flash-outline",      status: "done"    },
           { label: "Process", icon: "code-slash-outline", status: "running" },
-          { label: "Notify",  icon: "send-outline", status: "pending" },
+          { label: "Notify",  icon: "send-outline",       status: "pending" },
         ] };
       } else if (lower.includes("a2ui") || lower.includes("form") || lower.includes("config")) {
-        resp.content = "Here's an A2UI surface so you can configure it inline:";
-        resp.block = { type: "a2ui", surfaceId: "cfg", components: [
-          { id: "root", component: "Card", child: "col" },
-          { id: "col", component: "Column", children: ["title", "f1", "cb", "btn"] },
-          { id: "title", component: "Text", text: "Quick Config", variant: "h2" },
-          { id: "f1", component: "TextField", label: "Endpoint URL", value: "https://api.kittyclaw.app" },
-          { id: "cb", component: "CheckBox", label: "Enable webhook", checked: true },
-          { id: "btn", component: "Button", text: "Apply", variant: "primary" },
+        resp.content = "Interactive config surface:";
+        resp.block   = { type: "a2ui", surfaceId: "cfg-inline", components: [
+          { id: "root",  component: "Card",      child: "col"               },
+          { id: "col",   component: "Column",    children: ["t","f","cb","btn"] },
+          { id: "t",     component: "Text",      text: "Quick Config",  variant: "h2" },
+          { id: "f",     component: "TextField", label: "Endpoint URL", value: "https://api.kittyclaw.app" },
+          { id: "cb",    component: "CheckBox",  label: "Enable webhook", checked: true },
+          { id: "btn",   component: "Button",    text: "Apply",         variant: "primary" },
         ] };
       } else if (lower.includes("code")) {
-        resp.content = "Here is the generated code:";
-        resp.block = { type: "code", lang: "python", code: "async def kitty_task():\n    # Fetch and transform\n    data = await api.get('/v1/items')\n    return [d for d in data if d.active]" };
+        resp.content = "Generated code:";
+        resp.block   = { type: "code", lang: "python", code: "async def kitty_task():\n    # Fetch and transform\n    data = await api.get('/v1/items')\n    return [d for d in data if d.active]" };
       } else {
-        resp.content = "I'll process that and update the parameters right away.\n\nTry asking me about: **mermaid**, **architecture**, **terminal**, **swarm**, **preview**, **research**, **search**, **browser**, **automation**, **a2ui** or **code**.";
+        resp.content = "Got it! I'm on it.\n\nYou can ask me about **mermaid**, **architecture**, **terminal**, **swarm**, **preview**, **research**, **search**, **browser**, **automation**, **a2ui**, or **code** to see each block type.";
       }
-      setMessages((p) => [...p, resp]);
-    }, 1300);
-  };
 
-  const handleFabSubmit = () => {
-    if (!newChatText.trim()) return;
-    setActiveConvo({ name: "New Agent Session", status: "running" });
-    setMessages([]);
-    handleSend(newChatText);
-    setView("chat");
-    setTimeout(() => {
-      setNewChatText("");
-      setFabExpanded(false);
-    }, 400);
-  };
+      setMessages(prev => [...prev, resp]);
+    }, 1400);
+  }
 
-  const initiateNewChat = () => {
-    setView("home");
-    setIsChatMenuOpen(false);
-    setTimeout(() => setFabExpanded(true), 250);
-  };
+  function toggleTool(id: number) {
+    setExpandedTools(prev => ({ ...prev, [id]: !prev[id] }));
+  }
 
-  const handleApprove = (msg: Message) => {
-    setMessages((p) => p.filter((m) => m.id !== msg.id).concat([{ id: Date.now(), role: "user", content: "Approved. Proceed." }]));
-    setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
-      setMessages((p) => [...p, { id: Date.now() + 1, role: "agent", content: "Deployment initiated. ✓" }]);
-    }, 900);
-  };
-  const handleReject = (msg: Message) => {
-    setMessages((p) => p.filter((m) => m.id !== msg.id).concat([{ id: Date.now(), role: "user", content: "Let's review first." }]));
-    setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
-      setMessages((p) => [...p, { id: Date.now() + 1, role: "agent", content: "Pausing deployment. What should we review?" }]);
-    }, 900);
-  };
+  function closePopovers() {
+    setShowProcesses(false);
+    setShowChatMenu(false);
+  }
 
-  const openConvo = (c: any) => {
-    setActiveConvo(c);
-    setMessages(MOCK_CHATS[c.id] || []);
-    setView("chat");
-  };
-
-  // animated view layers
-  const homeT = useSharedValue(view === "home" ? 1 : 0);
-  const chatT = useSharedValue(view === "chat" ? 1 : 0);
-  useEffect(() => {
-    homeT.value = withTiming(view === "home" ? 1 : 0, { duration: 480, easing: Easing.bezier(0.32, 0.72, 0, 1) });
-    chatT.value = withTiming(view === "chat" ? 1 : 0, { duration: 480, easing: Easing.bezier(0.32, 0.72, 0, 1) });
-  }, [view]);
-  const homeStyle = useAnimatedStyle(() => ({
-    opacity: homeT.value,
-    transform: [{ scale: 0.92 + homeT.value * 0.08 }],
-  }));
-  const chatStyle = useAnimatedStyle(() => ({
-    opacity: chatT.value,
-    transform: [{ translateY: (1 - chatT.value) * 40 }],
-  }));
+  const isChat = appView === "chat";
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
-      <View style={styles.outer}>
-        <View style={[styles.shell, { width: PHONE_WIDTH }]}>
-          {/* ambient blobs */}
-          <AmbientBlob style={{ top: -80, left: -80, width: 280, height: 220 }} color={T.amber + "1A"} />
-          <AmbientBlob style={{ bottom: -100, right: -80, width: 320, height: 240 }} color={T.violet + "14"} delay={4000} />
+    <View style={styles.root}>
+      <LinearGradient colors={[T.bg, "#060504"]} style={StyleSheet.absoluteFill} pointerEvents="none" />
+      <AmbientBlob style={{ top: -80,  left:  -80, width: 300, height: 220 }} color={T.amber  + "14"} />
+      <AmbientBlob style={{ bottom: -80, right: -80, width: 320, height: 240 }} color={T.violet + "0E"} delay={4000} />
 
-          {/* Background subtle gradient */}
-          <LinearGradient
-            colors={[T.bg, "#070605"]}
-            style={StyleSheet.absoluteFill}
-            pointerEvents="none"
-          />
+      {/* Tap-behind to dismiss popovers */}
+      {(showProcesses || showChatMenu) && (
+        <TouchableOpacity style={StyleSheet.absoluteFillObject} activeOpacity={1} onPress={closePopovers} />
+      )}
 
-          {/* HEADER */}
-          <Header
-            view={view}
-            onMenu={() => setIsSidebarOpen(true)}
-            onBack={() => setView("home")}
-            activeConvo={activeConvo}
-            overallProgress={overallProgress}
-            onProgressTap={() => setIsProcessesOpen((s) => !s)}
-            onNewChat={initiateNewChat}
-            onChatMenu={() => setIsChatMenuOpen((s) => !s)}
-          />
+      {/* HEADER */}
+      <Header
+        view={isChat ? "chat" : "home"}
+        onMenu={() => { setSidebarOpen(true); closePopovers(); }}
+        onBack={handleBack}
+        activeConvo={activeConvo}
+        overallProgress={overall}
+        onProgressTap={() => { setShowProcesses(v => !v); setShowChatMenu(false); }}
+        onNewChat={newChat}
+        onChatMenu={() => { setShowChatMenu(v => !v); setShowProcesses(false); }}
+      />
 
-          {/* DROPDOWN POSITIONERS (anchored top-right) */}
-          {isProcessesOpen && view === "home" && (
-            <>
-              <TouchableOpacity activeOpacity={1} onPress={() => setIsProcessesOpen(false)} style={[StyleSheet.absoluteFillObject, { zIndex: 90 }]} />
-              <View style={{ position: "absolute", top: 72, right: 20, zIndex: 100 }}>
-                <ProcessesPopover tasks={bgTasks} />
-              </View>
-            </>
-          )}
-          {isChatMenuOpen && view === "chat" && (
-            <>
-              <TouchableOpacity activeOpacity={1} onPress={() => setIsChatMenuOpen(false)} style={[StyleSheet.absoluteFillObject, { zIndex: 90 }]} />
-              <View style={{ position: "absolute", top: 72, right: 20, zIndex: 100 }}>
-                <ChatMenuPopover />
-              </View>
-            </>
-          )}
-
-          {/* HOME LAYER */}
-          {view === "home" && (
-            <Animated.View entering={FadeIn.duration(300)} style={StyleSheet.absoluteFillObject}>
-              {activeTab === "chats" && <ChatsView onOpen={openConvo} />}
-              {activeTab === "spaces" && <SpacesView />}
-              {activeTab === "files" && <FilesView />}
-              <BottomBar
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                fabExpanded={fabExpanded}
-                setFabExpanded={setFabExpanded}
-                newChatText={newChatText}
-                setNewChatText={setNewChatText}
-                onSubmit={handleFabSubmit}
-              />
-            </Animated.View>
-          )}
-
-          {/* CHAT LAYER */}
-          {view === "chat" && (
-            <Animated.View entering={FadeIn.duration(300)} style={StyleSheet.absoluteFillObject}>
-              <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={{ flex: 1 }}
-                keyboardVerticalOffset={0}
-              >
-                <ScrollView
-                  ref={scrollRef}
-                  contentContainerStyle={{ paddingTop: 90, paddingBottom: 100, paddingHorizontal: 16 }}
-                  showsVerticalScrollIndicator={false}
-                >
-                  <View style={{ gap: 8 }}>
-                    {messages.map((m) =>
-                      m.role === "user"
-                        ? <UserBubble key={m.id} msg={m} />
-                        : <AgentBubble key={m.id} msg={m} expandedTools={expandedTools} toggleTool={toggleTool} onApprove={handleApprove} onReject={handleReject} />,
-                    )}
-                    {isTyping && <TypingMessage />}
-                  </View>
-                </ScrollView>
-
-                {/* Floating chat input (no background behind it) */}
-                <View style={chatStyles.inputArea}>
-                  <GlassPill rounded={28} style={{ flex: 1, height: 56, borderColor: T.amber + "44" }}>
-                    <View style={chatStyles.inputRow}>
-                      <TouchableOpacity style={chatStyles.iconBtn}>
-                        <Ic name="attach-outline" size={20} color={T.textSec} />
-                      </TouchableOpacity>
-                      <TextInput
-                        value={inputText}
-                        onChangeText={setInputText}
-                        placeholder="Message kittyclaw…"
-                        placeholderTextColor={T.textMut}
-                        onSubmitEditing={() => handleSend()}
-                        returnKeyType="send"
-                        style={{ flex: 1, color: T.textPri, fontSize: 15, paddingHorizontal: 6, height: "100%" }}
-                      />
-                      {inputText.length > 0 ? (
-                        <TouchableOpacity onPress={() => handleSend()} style={[chatStyles.iconBtn, { backgroundColor: T.amber }]}>
-                          <Ic name="send" size={16} color="#1A1208" />
-                        </TouchableOpacity>
-                      ) : (
-                        <TouchableOpacity style={chatStyles.iconBtn}>
-                          <Ic name="mic" size={20} color={T.amber} />
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  </GlassPill>
-                </View>
-              </KeyboardAvoidingView>
-            </Animated.View>
-          )}
-
-          {/* SIDEBAR */}
-          {isSidebarOpen && <Sidebar onClose={() => setIsSidebarOpen(false)} />}
+      {/* PROCESSES POPOVER */}
+      {showProcesses && (
+        <View style={{ position: "absolute", top: 68, right: 18, zIndex: 99 }}>
+          <ProcessesPopover tasks={bgTasks} />
         </View>
-      </View>
-    </SafeAreaProvider>
+      )}
+
+      {/* CHAT MENU POPOVER */}
+      {showChatMenu && (
+        <View style={{ position: "absolute", top: 68, right: 18, zIndex: 99 }}>
+          <ChatMenuPopover onNewChat={newChat} />
+        </View>
+      )}
+
+      {/* CONTENT */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={0}
+      >
+        {!isChat && (
+          <View style={{ flex: 1 }}>
+            {activeTab === "home"   && <HomeView bgTasks={bgTasks} overallProgress={overall} onOpenChat={openChat} />}
+            {activeTab === "chats"  && <ChatsView onOpen={openChat} />}
+            {activeTab === "spaces" && <SpacesView />}
+            {activeTab === "files"  && <FilesView />}
+          </View>
+        )}
+
+        {isChat && (
+          <Animated.View entering={FadeIn.duration(280)} style={{ flex: 1 }}>
+            {/* Convo status bar */}
+            {activeConvo && (
+              <View style={styles.statusBar}>
+                <StatusDot status={activeConvo.status} size={6} />
+                <Text style={{ color: T.textSec, fontSize: 11.5 }}>
+                  {activeConvo.status === "running" ? "Agent running"
+                   : activeConvo.status === "waiting" ? "Waiting for approval"
+                   : activeConvo.status === "error"   ? "Error"
+                   : "Completed"}
+                </Text>
+              </View>
+            )}
+
+            {/* Messages */}
+            <ScrollView
+              ref={scrollRef}
+              showsVerticalScrollIndicator={false}
+              keyboardDismissMode="on-drag"
+              contentContainerStyle={{
+                paddingTop:        activeConvo ? 88 : 80,
+                paddingBottom:     120,
+                paddingHorizontal: 16,
+              }}
+            >
+              {messages.length === 0 && !isTyping && (
+                <Animated.View entering={FadeInDown.duration(400)} style={styles.empty}>
+                  <View style={styles.emptyIcon}>
+                    <Ic name="sparkles-outline" size={28} color={T.amber} />
+                  </View>
+                  <Text style={styles.emptyTitle}>New Session</Text>
+                  <Text style={styles.emptySub}>Type a message to get started.</Text>
+                </Animated.View>
+              )}
+
+              {messages.map((m) =>
+                m.role === "user"
+                  ? <UserBubble key={m.id} msg={m} />
+                  : <AgentBubble
+                      key={m.id}
+                      msg={m}
+                      expandedTools={expandedTools}
+                      toggleTool={toggleTool}
+                      onApprove={(msg) => {
+                        setMessages(prev => prev.map(x =>
+                          x.id === msg.id
+                            ? { ...x, role: "agent" as const, content: "✓ Approved. Deploying now…" }
+                            : x
+                        ));
+                      }}
+                      onReject={(msg) => {
+                        setMessages(prev => prev.map(x =>
+                          x.id === msg.id
+                            ? { ...x, role: "agent" as const, content: "Rejected. No changes were made." }
+                            : x
+                        ));
+                      }}
+                    />
+              )}
+
+              {isTyping && <TypingMessage />}
+            </ScrollView>
+
+            <ScrollFade position="top" />
+          </Animated.View>
+        )}
+      </KeyboardAvoidingView>
+
+      {/* BOTTOM BAR — always visible */}
+      <BottomBar
+        activeTab={activeTab}
+        setActiveTab={(t) => { setActiveTab(t); setAppView("home"); }}
+        fabExpanded={fabExpanded}
+        setFabExpanded={setFabExpanded}
+        newChatText={newChatText}
+        setNewChatText={setNewChatText}
+        onSubmit={handleSubmit}
+        view={isChat ? "chat" : "home"}
+      />
+
+      {/* SIDEBAR */}
+      {sidebarOpen && <Sidebar onClose={() => setSidebarOpen(false)} />}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  outer: { flex: 1, backgroundColor: "#000", alignItems: "center", justifyContent: "center" },
-  shell: { flex: 1, backgroundColor: T.bg, overflow: "hidden", position: "relative" },
-});
-
-const chatStyles = StyleSheet.create({
-  inputArea: { position: "absolute", bottom: 24, left: 20, right: 20, height: 56, flexDirection: "row" },
-  inputRow: { flex: 1, flexDirection: "row", alignItems: "center", paddingHorizontal: 6, gap: 4 },
-  iconBtn: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
+  root: {
+    flex:            1,
+    backgroundColor: T.bg,
+    overflow:        "hidden",
+    position:        "relative",
+  },
+  statusBar: {
+    position:          "absolute",
+    top:               60,
+    left:              0,
+    right:             0,
+    flexDirection:     "row",
+    alignItems:        "center",
+    justifyContent:    "center",
+    gap:               8,
+    paddingVertical:   6,
+    backgroundColor:   T.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: T.border,
+    zIndex:            10,
+  },
+  empty: {
+    alignItems:    "center",
+    justifyContent:"center",
+    paddingTop:    100,
+    gap:           12,
+  },
+  emptyIcon: {
+    width:           56,
+    height:          56,
+    borderRadius:    18,
+    backgroundColor: T.amber + "14",
+    borderWidth:     1,
+    borderColor:     T.amber + "28",
+    alignItems:      "center",
+    justifyContent:  "center",
+  },
+  emptyTitle: { color: T.textPri,  fontSize: 18, fontWeight: "600" },
+  emptySub:   { color: T.textSec,  fontSize: 13, textAlign: "center" },
 });
