@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
@@ -6,57 +6,41 @@ import { T, STATUS_COLOR } from "../../src/theme";
 import { Ic, StatusDot } from "../../src/primitives";
 import { SPACES } from "../../src/data/mock";
 
-const CARD_HEIGHT: Record<string, number> = { lg: 230, md: 185, sm: 150 };
-
 function SpaceCard({ space, idx }: { space: typeof SPACES[number]; idx: number }) {
-  const h = CARD_HEIGHT[space.size || "md"];
   return (
-    <Animated.View entering={FadeInDown.delay(idx * 55).duration(300)}>
-      <TouchableOpacity activeOpacity={0.8} style={[s.card, { minHeight: h }]}>
+    <Animated.View entering={FadeInDown.delay(idx * 45).duration(260)}>
+      <TouchableOpacity activeOpacity={0.75} style={s.card}>
         <LinearGradient
-          colors={[space.color + "16", space.color + "04"]}
+          colors={[space.color + "14", space.color + "03"]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
         />
-
-        {/* Top row: icon + status */}
         <View style={s.cardTop}>
-          <View style={[s.cardIcon, { backgroundColor: space.color + "1A", borderColor: space.color + "44" }]}>
-            <Ic name={space.icon as any} size={18} color={space.color} />
+          <View style={[s.cardIcon, { backgroundColor: space.color + "18", borderColor: space.color + "35" }]}>
+            <Ic name={space.icon as any} size={16} color={space.color} />
           </View>
-          <StatusDot status={space.status} size={7} />
+          <StatusDot status={space.status} size={6} />
         </View>
-
-        {/* Name + desc */}
-        <Text style={s.cardName}>{space.name}</Text>
+        <Text style={s.cardName} numberOfLines={2}>{space.name}</Text>
         <Text style={s.cardDesc} numberOfLines={3}>{space.desc}</Text>
-
-        {/* Tags */}
         {space.tags && space.tags.length > 0 && (
           <View style={s.tagRow}>
-            {space.tags.map((tag, t) => (
-              <View key={t} style={[s.tag, { backgroundColor: space.color + "18" }]}>
+            {space.tags.slice(0, 2).map((tag, t) => (
+              <View key={t} style={[s.tag, { backgroundColor: space.color + "15" }]}>
                 <Text style={[s.tagText, { color: space.color }]}>#{tag}</Text>
               </View>
             ))}
           </View>
         )}
-
-        {/* Footer: agents + time */}
         <View style={s.cardFooter}>
+          <Text style={s.cardTime}>{space.lastActive}</Text>
           <View style={{ flexDirection: "row" }}>
-            {space.agents.slice(0, 4).map((ac, k) => (
-              <View key={k} style={[s.agentDot, { backgroundColor: ac + "28", marginLeft: k === 0 ? 0 : -6 }]}>
-                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: ac }} />
+            {space.agents.slice(0, 3).map((ac, k) => (
+              <View key={k} style={[s.agentDot, { backgroundColor: ac + "25", marginLeft: k === 0 ? 0 : -5 }]}>
+                <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: ac }} />
               </View>
             ))}
-            {space.agents.length > 4 && (
-              <View style={[s.agentDot, { backgroundColor: T.card, marginLeft: -6 }]}>
-                <Text style={{ color: T.textMut, fontSize: 8 }}>+{space.agents.length - 4}</Text>
-              </View>
-            )}
           </View>
-          <Text style={s.cardTime}>{space.lastActive}</Text>
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -69,46 +53,39 @@ export default function SpacesScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: T.bg }}>
-      {/* Header */}
       <View style={s.header}>
         <View>
           <Text style={s.title}>Spaces</Text>
           <Text style={s.sub}>{SPACES.filter(sp => sp.status === "running").length} running</Text>
         </View>
         <TouchableOpacity activeOpacity={0.8} style={s.newBtn}>
-          <Ic name="add" size={20} color={T.bg} />
-          <Text style={{ color: T.bg, fontSize: 13, fontWeight: "700" }}>New</Text>
+          <Ic name="add" size={18} color={T.bg} />
+          <Text style={{ color: T.bg, fontSize: 12, fontWeight: "700" }}>New</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
-        {/* Status summary */}
-        <View style={s.summaryRow}>
-          {(["running", "waiting", "done", "error"] as const).map(st => {
-            const count = SPACES.filter(sp => sp.status === st).length;
-            return (
-              <View key={st} style={s.summaryCard}>
-                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: STATUS_COLOR[st], marginBottom: 6 }} />
-                <Text style={[s.summaryCount, { color: STATUS_COLOR[st] }]}>{count}</Text>
-                <Text style={s.summaryLabel}>{st}</Text>
-              </View>
-            );
-          })}
-        </View>
+      <View style={s.statusRow}>
+        {(["running", "waiting", "done", "error"] as const).map(st => {
+          const count = SPACES.filter(sp => sp.status === st).length;
+          return (
+            <View key={st} style={s.statusChip}>
+              <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: STATUS_COLOR[st] }} />
+              <Text style={[s.statusCount, { color: STATUS_COLOR[st] }]}>{count}</Text>
+              <Text style={s.statusLabel}>{st}</Text>
+            </View>
+          );
+        })}
+      </View>
 
-        {/* Masonry */}
-        <View style={{ flexDirection: "row", gap: 12 }}>
-          <View style={{ flex: 1, gap: 12 }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <View style={{ flex: 1, gap: 10 }}>
             {col1.map((sp, i) => <SpaceCard key={sp.id} space={sp} idx={i * 2} />)}
           </View>
-          <View style={{ flex: 1, gap: 12 }}>
-            {/* New space placeholder */}
-            <TouchableOpacity activeOpacity={0.75} style={s.newCard}>
-              <View style={s.newCardIcon}>
-                <Ic name="add" size={24} color={T.textSec} />
-              </View>
+          <View style={{ flex: 1, gap: 10 }}>
+            <TouchableOpacity activeOpacity={0.7} style={s.newCard}>
+              <Ic name="add" size={22} color={T.textSec} />
               <Text style={s.newCardLabel}>New Space</Text>
-              <Text style={s.newCardSub}>Blank or template</Text>
             </TouchableOpacity>
             {col2.map((sp, i) => <SpaceCard key={sp.id} space={sp} idx={i * 2 + 1} />)}
           </View>
@@ -119,28 +96,26 @@ export default function SpacesScreen() {
 }
 
 const s = StyleSheet.create({
-  header:       { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", paddingHorizontal: 18, paddingTop: 62, paddingBottom: 16 },
-  title:        { color: T.textPri, fontSize: 28, fontWeight: "700", letterSpacing: -0.5 },
-  sub:          { color: T.textSec, fontSize: 13, marginTop: 3 },
-  newBtn:       { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: T.amber, borderRadius: 20 },
-  scroll:       { paddingHorizontal: 18, paddingBottom: 110 },
-  summaryRow:   { flexDirection: "row", gap: 10, marginBottom: 18 },
-  summaryCard:  { flex: 1, backgroundColor: T.card, borderRadius: 14, borderWidth: 1, borderColor: T.border, padding: 12, alignItems: "center" },
-  summaryCount: { fontSize: 20, fontWeight: "800", letterSpacing: -0.5 },
-  summaryLabel: { color: T.textSec, fontSize: 10, fontWeight: "600", textTransform: "capitalize", marginTop: 2 },
-  card:         { backgroundColor: T.card, borderRadius: 20, borderWidth: 1, borderColor: T.border, padding: 14, overflow: "hidden", gap: 6 },
-  cardTop:      { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 },
-  cardIcon:     { width: 40, height: 40, borderRadius: 13, borderWidth: 1, alignItems: "center", justifyContent: "center" },
-  cardName:     { color: T.textPri, fontSize: 15, fontWeight: "700", lineHeight: 19 },
-  cardDesc:     { color: T.textSec, fontSize: 11.5, lineHeight: 16, flex: 1 },
-  tagRow:       { flexDirection: "row", flexWrap: "wrap", gap: 5, marginTop: 4 },
-  tag:          { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 7 },
-  tagText:      { fontSize: 10, fontWeight: "600" },
-  cardFooter:   { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 8 },
-  agentDot:     { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: T.card, alignItems: "center", justifyContent: "center" },
-  cardTime:     { color: T.textMut, fontSize: 10 },
-  newCard:      { minHeight: 130, backgroundColor: T.card, borderRadius: 20, borderWidth: 1.5, borderColor: "rgba(255,255,255,0.07)", borderStyle: "dashed", alignItems: "center", justifyContent: "center", gap: 6 },
-  newCardIcon:  { width: 44, height: 44, borderRadius: 22, backgroundColor: "rgba(255,255,255,0.04)", alignItems: "center", justifyContent: "center" },
-  newCardLabel: { color: T.textSec, fontSize: 13.5, fontWeight: "600" },
-  newCardSub:   { color: T.textMut, fontSize: 11 },
+  header:      { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingTop: 56, paddingBottom: 10 },
+  title:       { color: T.textPri, fontSize: 24, fontWeight: "700", letterSpacing: -0.4 },
+  sub:         { color: T.textSec, fontSize: 12, marginTop: 1 },
+  newBtn:      { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 13, paddingVertical: 8, backgroundColor: T.amber, borderRadius: 18 },
+  statusRow:   { flexDirection: "row", paddingHorizontal: 16, gap: 8, marginBottom: 12 },
+  statusChip:  { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: T.card, borderRadius: 10, borderWidth: 1, borderColor: T.border },
+  statusCount: { fontSize: 12, fontWeight: "700" },
+  statusLabel: { color: T.textSec, fontSize: 10.5, textTransform: "capitalize" },
+  scroll:      { paddingHorizontal: 16, paddingBottom: 90 },
+  card:        { backgroundColor: T.card, borderRadius: 16, borderWidth: 1, borderColor: T.border, padding: 12, overflow: "hidden", gap: 5 },
+  cardTop:     { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 },
+  cardIcon:    { width: 34, height: 34, borderRadius: 10, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  cardName:    { color: T.textPri, fontSize: 13.5, fontWeight: "700", lineHeight: 18 },
+  cardDesc:    { color: T.textSec, fontSize: 11, lineHeight: 15 },
+  tagRow:      { flexDirection: "row", flexWrap: "wrap", gap: 4 },
+  tag:         { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6 },
+  tagText:     { fontSize: 9.5, fontWeight: "600" },
+  cardFooter:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 4 },
+  agentDot:    { width: 16, height: 16, borderRadius: 8, borderWidth: 1.5, borderColor: T.card, alignItems: "center", justifyContent: "center" },
+  cardTime:    { color: T.textMut, fontSize: 9.5 },
+  newCard:     { height: 110, backgroundColor: T.card, borderRadius: 16, borderWidth: 1, borderColor: "rgba(255,255,255,0.06)", borderStyle: "dashed", alignItems: "center", justifyContent: "center", gap: 5 },
+  newCardLabel:{ color: T.textSec, fontSize: 12, fontWeight: "600" },
 });
