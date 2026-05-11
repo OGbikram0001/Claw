@@ -1,0 +1,3 @@
+## 2024-05-18 - Missing Accessibility Labels on Icon-Only Buttons
+**Learning:** Custom icon-only touchable components (`TouchableOpacity` or `Pressable` wrapping `<Ic />` or SVG) in this React Native app consistently lack `accessibilityRole="button"` and `accessibilityLabel` attributes, causing VoiceOver/TalkBack to read them incorrectly or ignore them. The `accessibilityState` should also be used to indicate selected states.
+**Action:** When implementing or modifying icon-only touchables, always enforce `accessibilityRole="button"` and context-aware `accessibilityLabel` props to ensure full screen reader support.
