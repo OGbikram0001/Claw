@@ -36,9 +36,22 @@ export default function ChatScreen() {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
   }
 
-  function toggleTool(id: number) {
+  // ⚡ Bolt: Wrapped prop handlers with useCallback to maintain function reference equality and prevent unnecessary child re-renders.
+  const toggleTool = React.useCallback((id: number) => {
     setExpandedTools(p => ({ ...p, [id]: !p[id] }));
-  }
+  }, []);
+
+  const handleApprove = React.useCallback((msg: any) => {
+    setMessages(p => p.map(x =>
+      x.id === msg.id ? { ...x, role: "agent" as const, content: "✓ Approved. Deploying…" } : x
+    ));
+  }, []);
+
+  const handleReject = React.useCallback((msg: any) => {
+    setMessages(p => p.map(x =>
+      x.id === msg.id ? { ...x, role: "agent" as const, content: "Rejected. No changes made." } : x
+    ));
+  }, []);
 
   function handleSend(override?: string) {
     const text = (override ?? input).trim();
@@ -190,14 +203,10 @@ export default function ChatScreen() {
               : <AgentBubble
                   key={m.id}
                   msg={m}
-                  expandedTools={expandedTools}
-                  toggleTool={toggleTool}
-                  onApprove={msg => setMessages(p => p.map(x =>
-                    x.id === msg.id ? { ...x, role: "agent" as const, content: "✓ Approved. Deploying…" } : x
-                  ))}
-                  onReject={msg => setMessages(p => p.map(x =>
-                    x.id === msg.id ? { ...x, role: "agent" as const, content: "Rejected. No changes made." } : x
-                  ))}
+                  isToolExpanded={!!expandedTools[m.id]}
+                  onToggleTool={toggleTool}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
                 />
           )}
 
