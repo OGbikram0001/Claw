@@ -1,0 +1,4 @@
+## 2024-05-13 - Overly Permissive CORS Configuration with Credentials
+**Vulnerability:** The FastAPI application configured `CORSMiddleware` with `allow_credentials=True` and `allow_origins=["*"]`.
+**Learning:** When `allow_credentials=True` is configured, the `Access-Control-Allow-Origin` header must not be a wildcard `*`. This exposes the application to Cross-Site Request Forgery (CSRF) and data leakage if any site can make credentialed requests. The middleware should use a strict whitelist of allowed origins.
+**Prevention:** Always populate `allow_origins` from a strictly controlled environment variable (e.g., `ALLOWED_ORIGINS`). Default it to an empty list `[]` to fail securely if the environment variable is not set. Use `os.environ.get()` instead of direct dictionary access to avoid application crashes.
