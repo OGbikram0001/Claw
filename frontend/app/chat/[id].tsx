@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity,
   KeyboardAvoidingView, Platform, StyleSheet,
@@ -36,9 +36,22 @@ export default function ChatScreen() {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
   }
 
-  function toggleTool(id: number) {
+  // Memoized handlers to prevent entire list re-renders when passed to AgentBubble
+  const toggleTool = useCallback((id: number) => {
     setExpandedTools(p => ({ ...p, [id]: !p[id] }));
-  }
+  }, []);
+
+  const handleApprove = useCallback((id: number) => {
+    setMessages(p => p.map(x =>
+      x.id === id ? { ...x, role: "agent" as const, content: "✓ Approved. Deploying…" } : x
+    ));
+  }, []);
+
+  const handleReject = useCallback((id: number) => {
+    setMessages(p => p.map(x =>
+      x.id === id ? { ...x, role: "agent" as const, content: "Rejected. No changes made." } : x
+    ));
+  }, []);
 
   function handleSend(override?: string) {
     const text = (override ?? input).trim();
@@ -190,14 +203,10 @@ export default function ChatScreen() {
               : <AgentBubble
                   key={m.id}
                   msg={m}
-                  expandedTools={expandedTools}
+                  isExpanded={!!expandedTools[m.id]}
                   toggleTool={toggleTool}
-                  onApprove={msg => setMessages(p => p.map(x =>
-                    x.id === msg.id ? { ...x, role: "agent" as const, content: "✓ Approved. Deploying…" } : x
-                  ))}
-                  onReject={msg => setMessages(p => p.map(x =>
-                    x.id === msg.id ? { ...x, role: "agent" as const, content: "Rejected. No changes made." } : x
-                  ))}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
                 />
           )}
 
