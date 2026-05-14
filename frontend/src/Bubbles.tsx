@@ -12,7 +12,8 @@ import {
 import A2UIRenderer from "./A2UIRenderer";
 
 /* ─── USER BUBBLE ─── */
-export function UserBubble({ msg }: { msg: any }) {
+// Wrapped in React.memo to avoid re-renders when parent list state changes
+export const UserBubble = React.memo(function UserBubble({ msg }: { msg: any }) {
   return (
     <Animated.View entering={FadeInDown.duration(200)} style={{ alignItems: "flex-end", marginVertical: 6, paddingLeft: 48 }}>
       <View style={{
@@ -29,17 +30,18 @@ export function UserBubble({ msg }: { msg: any }) {
       </View>
     </Animated.View>
   );
-}
+});
 
 /* ─── AGENT MESSAGE (no bubble, full-width, icon first) ─── */
-export function AgentBubble({
-  msg, expandedTools, toggleTool, onApprove, onReject,
+// Wrapped in React.memo and accepts primitive isExpanded to prevent re-render cascades
+export const AgentBubble = React.memo(function AgentBubble({
+  msg, isExpanded, toggleTool, onApprove, onReject,
 }: {
   msg: any;
-  expandedTools: Record<number, boolean>;
+  isExpanded: boolean;
   toggleTool: (id: number) => void;
-  onApprove: (m: any) => void;
-  onReject: (m: any) => void;
+  onApprove: (id: number) => void;
+  onReject: (id: number) => void;
 }) {
   if (msg.role === "think") {
     return (
@@ -52,7 +54,7 @@ export function AgentBubble({
   if (msg.role === "tool") {
     return (
       <View style={{ marginVertical: 3, paddingLeft: 40, paddingRight: 8 }}>
-        <ToolCallBlock msg={msg} expanded={!!expandedTools[msg.id]} onToggle={() => toggleTool(msg.id)} />
+        <ToolCallBlock msg={msg} expanded={isExpanded} onToggle={() => toggleTool(msg.id)} />
       </View>
     );
   }
@@ -60,7 +62,7 @@ export function AgentBubble({
   if (msg.role === "approval") {
     return (
       <Animated.View entering={FadeInDown.duration(260)} style={{ marginVertical: 6 }}>
-        <ApprovalCard content={msg.content} onApprove={() => onApprove(msg)} onReject={() => onReject(msg)} />
+        <ApprovalCard content={msg.content} onApprove={() => onApprove(msg.id)} onReject={() => onReject(msg.id)} />
       </Animated.View>
     );
   }
@@ -106,7 +108,7 @@ export function AgentBubble({
       </View>
     </Animated.View>
   );
-}
+});
 
 /* ─── TYPING INDICATOR ─── */
 export function TypingMessage() {

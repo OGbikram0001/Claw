@@ -1,0 +1,3 @@
+## 2024-05-14 - Preventing Re-render Cascades in Complex List Components
+**Learning:** In chat views or long lists, passing complex state objects (like a full `expandedTools` mapping) directly to row items causes widespread unnecessary re-renders whenever any key changes, completely bypassing `React.memo` benefits. Similarly, inline lambda functions as props break memoization.
+**Action:** Heavily utilize `React.memo` for list item components (like `AgentBubble`). Break down mapping objects into specific boolean primitives (e.g., `isExpanded={!!expandedTools[id]}`) in the render loop. Extract inline functions and stabilize their references using `useCallback` to preserve reference stability and guarantee memoization effectiveness.
