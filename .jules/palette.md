@@ -1,0 +1,3 @@
+## 2025-02-18 - Missing Accessibility on Icon-only Components
+**Learning:** In the React Native application, custom icon-only components using `TouchableOpacity` (e.g., in the chat screen header and input bar) consistently lack accessibility attributes. Screen readers cannot interpret these buttons without a role and descriptive label, making the interface completely inaccessible for visually impaired users.
+**Action:** When working on React Native UI components, proactively add `accessibilityRole="button"` and `accessibilityLabel` attributes to any icon-only touchable component to ensure full screen reader support.
