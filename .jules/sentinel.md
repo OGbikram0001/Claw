@@ -1,0 +1,4 @@
+## 2024-05-18 - Overly Permissive CORS Configuration and Unsafe Env Variables
+**Vulnerability:** The FastAPI server was configured with `allow_origins=["*"]` while having `allow_credentials=True`. This is a critical security risk as it allows any origin to make requests with credentials. In addition, the application used direct dictionary access for `os.environ` keys (`MONGO_URL` and `DB_NAME`), which would cause unhandled crashes (DoS risk) if these variables were absent.
+**Learning:** Hardcoded wildcard CORS with credentials breaks cross-origin security guarantees entirely. Relying on strict environment variable dictionary access without defaults can create fragile environments.
+**Prevention:** Always parse CORS allowed origins from an environment variable, explicitly splitting into a list and falling back to an empty list securely (`[]`). When accessing environment variables, use `os.environ.get()` with safe defaults to prevent unexpected crashes.
