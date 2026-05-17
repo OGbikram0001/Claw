@@ -1,0 +1,3 @@
+## 2024-12-05 - React Native Custom Icon Buttons Require Dual Accessibility Props
+**Learning:** In the React Native frontend, when creating custom icon-only components using `TouchableOpacity` or `Pressable`, standard screen reader accessibility requires the explicit inclusion of *both* `accessibilityRole="button"` and `accessibilityLabel` attributes. Omitting `accessibilityRole` can result in screen readers not announcing the element as a button, making it unintuitive for visually impaired users.
+**Action:** Always append both `accessibilityRole="button"` and a contextual `accessibilityLabel` to any custom `TouchableOpacity` or `Pressable` wrapper around an icon that functions as an interactive button.
