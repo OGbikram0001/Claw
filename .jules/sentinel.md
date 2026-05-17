@@ -1,0 +1,4 @@
+## 2024-05-17 - Fix Overly Permissive CORS Configuration and Unsafe Environment Variables
+**Vulnerability:** Fast API CORSMiddleware was configured with a wildcard `allow_origins=["*"]` combined with `allow_credentials=True`. Additionally, application secrets were retrieved unsafely using `os.environ[...]`.
+**Learning:** The permissive CORS setting exposes API endpoints to unauthorized cross-origin requests, which could lead to sensitive data exposure or CSRF vulnerabilities. Missing environment variables previously caused unhandled KeyError application crashes instead of gracefully failing securely.
+**Prevention:** Instead of wildcards, `ALLOWED_ORIGINS` should be explicitly fetched from environment variables, defaulting to an empty list `[]` to fail securely. Environment variables should always be fetched using `os.environ.get()` with appropriate defaults to prevent application crashes.
