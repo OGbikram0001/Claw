@@ -1,0 +1,3 @@
+## 2026-05-18 - Prevent React re-render cascades in chat
+**Learning:** In complex chat views where the parent component manages rapidly changing state (like `inputText` on every keystroke), rendering inline mapping objects or arrow functions as props to list items causes severe re-render cascades, even if the list item isn't visibly changing.
+**Action:** Heavily utilize `React.memo` for list item components (`UserBubble`, `AgentBubble`), stabilize prop handlers with `useCallback`, and extract primitive boolean checks (`isToolExpanded={!!expandedTools[m.id]}`) instead of passing full state mapping objects to preserve reference stability.
