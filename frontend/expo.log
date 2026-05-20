@@ -1,0 +1,18 @@
+Starting project at /app/frontend
+Starting Metro Bundler
+The following packages should be updated for best compatibility with the installed expo version:
+  expo-clipboard@55.0.13 - expected version: ~8.0.8
+  expo-linear-gradient@55.0.13 - expected version: ~15.0.8
+  react-native-svg@15.15.4 - expected version: 15.12.1
+Your project may not work correctly until you install the expected versions of the packages.
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Web node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 2596ms node_modules/expo-router/node/render.js (1145 modules)
+Web node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.9% (1198/1198)
+Web Bundled 3787ms node_modules/expo-router/entry.js (1198 modules)
+Web node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 81ms node_modules/expo-router/node/render.js (1 module)
+Web Bundled 794ms node_modules/expo-router/entry.js (1 module)
+Web Bundled 1486ms node_modules/expo-router/entry.js (1191 modules)
+ LOG  [web] Logs will appear in the browser console
