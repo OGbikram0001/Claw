@@ -1,0 +1,3 @@
+## 2024-05-26 - Prevent Re-render Cascades in Chat List
+**Learning:** Complex state mapping objects (like `expandedTools: Record<number, boolean>`) and inline anonymous function handlers in parent components cause severe re-render cascades across all list item children in React Native, even when only one item's state changes.
+**Action:** Heavily utilize `React.memo` for list item components. Convert object mapping props into specific boolean primitives (e.g., `isToolExpanded={!!expandedTools[m.id]}`) and strictly use `useCallback` for prop handlers to preserve reference stability and isolate re-renders to the individual component.
