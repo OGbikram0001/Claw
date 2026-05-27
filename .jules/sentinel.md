@@ -1,0 +1,4 @@
+## 2024-05-27 - Insecure CORS wildcard with credentials
+**Vulnerability:** The FastAPI backend used a wildcard (`*`) for the `allow_origins` parameter in the `CORSMiddleware` configuration while simultaneously having `allow_credentials=True`. This is an insecure combination that browsers block. Also discovered that MongoDB connection logic lacked default values leading to an application crash on unconfigured startup.
+**Learning:** Hardcoded permissive CORS policies undermine origin enforcement, particularly when application endpoints assume cross-origin resource sharing. Environment variable reads must always use default fallbacks for secure failures.
+**Prevention:** Always define a specific whitelist for `allow_origins` loaded securely via environment variables (e.g. `ALLOWED_ORIGINS`). Utilize `os.environ.get()` with a safe default rather than bracket notation (e.g., `os.environ["VAR"]`) for critical configurations like database URLs.
