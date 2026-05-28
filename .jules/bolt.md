@@ -1,0 +1,3 @@
+## 2024-05-28 - Prevent re-render cascades in chat views
+**Learning:** In complex chat views with highly frequent state updates (like user input), child components can re-render repeatedly causing lag, especially if they depend on unstable object references or inline functions.
+**Action:** Heavily utilize `React.memo` for list item components (like `UserBubble` and `AgentBubble`) and `useCallback` for their prop handlers to preserve reference stability. Avoid passing large mapping objects directly as props; pass specific boolean primitives instead (e.g., `isToolExpanded={!!expandedTools[m.id]}`).
