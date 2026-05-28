@@ -1,0 +1,4 @@
+## 2024-05-28 - Insecure CORS and Environment Variable Access
+**Vulnerability:** Found overly permissive CORS `allow_origins=["*"]` configured alongside `allow_credentials=True` in FastAPI middleware. Additionally, the backend was directly accessing `os.environ['MONGO_URL']` and `os.environ['DB_NAME']` without fallbacks.
+**Learning:** Hardcoded wildcard `*` for CORS with `allow_credentials=True` allows malicious origins to read authenticated responses, compromising sensitive data. Direct dictionary access of environment variables causes the application to crash completely if the variable is missing rather than failing securely.
+**Prevention:** Always restrict `allow_origins` to a whitelist dynamically parsed from an environment variable like `ALLOWED_ORIGINS` (defaulting to empty). Use `os.environ.get('VAR', default)` to access environment variables defensively and prevent unhandled exceptions on startup.
