@@ -1,0 +1,4 @@
+## 2024-05-18 - Overly Permissive CORS and Insecure Env Vars
+**Vulnerability:** The backend had `allow_origins=["*"]` configured in `CORSMiddleware` while `allow_credentials=True` was also set, which is a major security flaw allowing any origin to make authenticated requests. Also, direct dictionary accesses `os.environ['VAR']` were used for environment variables, crashing the application if they are not provided.
+**Learning:** Hardcoded wildcard CORS origins with credentials enable cross-origin attacks like CSRF and data theft. Direct environment variable access can cause insecure or abrupt failures.
+**Prevention:** Always parse `ALLOWED_ORIGINS` from environment variables, defaulting to an empty list `[]` to fail securely. Use `os.environ.get()` with fallbacks to avoid crashes when variables are unconfigured.
