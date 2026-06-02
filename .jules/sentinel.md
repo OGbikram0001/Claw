@@ -1,0 +1,4 @@
+## 2024-05-06 - Overly Permissive CORS Configuration
+**Vulnerability:** Found `allow_origins=["*"]` hardcoded in `backend/server.py` `CORSMiddleware` configuration. This allows any website to make cross-origin requests to the API, potentially leading to unauthorized data access or CSRF-like attacks if credentials are inadvertently allowed or other mechanisms fail.
+**Learning:** Hardcoded wildcard CORS origins bypass the browser's same-origin policy completely. It is important to strictly govern the `ALLOWED_ORIGINS` environment variable and fail securely by defaulting to an empty list `[]` when no configuration is provided.
+**Prevention:** Always read `ALLOWED_ORIGINS` from environment variables, properly parse the comma-separated list, and default to `[]` if the variable is not set. Never use `["*"]` in production code.
