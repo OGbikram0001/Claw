@@ -1,0 +1,4 @@
+## 2024-03-24 - Overly Permissive CORS Configuration
+**Vulnerability:** The backend FastAPI server was configured with `allow_origins=["*"]` while simultaneously setting `allow_credentials=True`. This is insecure and violates the CORS specification, potentially allowing malicious sites to make authenticated requests.
+**Learning:** The default configuration lacked a mechanism to securely specify origins for different environments, leading to the use of a wildcard.
+**Prevention:** Always parse environment variables (like `ALLOWED_ORIGINS`) to dynamically construct the list of allowed origins. Ensure the application fails securely (e.g., by defaulting to an empty list or throwing a startup error) if the environment variable is missing or malformed when credentials are allowed.
