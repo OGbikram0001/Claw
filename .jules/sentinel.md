@@ -1,0 +1,4 @@
+## 2024-06-03 - [Permissive CORS with Credentials]
+**Vulnerability:** The FastAPI backend was configured with `allow_origins=["*"]` alongside `allow_credentials=True` in the `CORSMiddleware`, which is a critical security vulnerability that allows any website to make authenticated requests. Also, `os.environ` was accessed directly which could crash the application if environment variables are not set.
+**Learning:** This existed because standard FastAPI examples often show wildcard configurations for simplicity during development, which mistakenly got carried into the main server file without restriction or a fallback default.
+**Prevention:** To avoid this next time, always tie `allow_origins` to an environment variable like `ALLOWED_ORIGINS`, defaulting to an empty list `[]` to fail securely if unconfigured. Similarly, use `os.environ.get()` with safe defaults to prevent DoS via missing configuration.
