@@ -1,0 +1,3 @@
+## 2024-06-03 - React Native Re-render Cascades in Chat Views
+**Learning:** In complex React Native list/chat views (especially those with frequent updates like typing indicators or tool interactions), passing large mapping objects directly as props to child components can cause severe re-render cascades due to state co-location and prop reference instability.
+**Action:** Heavily utilize `React.memo` for list item components (like `UserBubble` and `AgentBubble`) and `useCallback` for their prop handlers. Instead of passing full state dictionaries down the tree, extract specific boolean primitives (e.g., `isToolExpanded={!!expandedTools[m.id]}`) for props to preserve reference stability and prevent unnecessary deep re-renders.
