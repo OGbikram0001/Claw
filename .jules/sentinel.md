@@ -1,0 +1,4 @@
+## 2024-06-03 - Overly Permissive CORS with Credentials
+**Vulnerability:** The FastAPI backend used a wildcard `allow_origins=["*"]` while simultaneously setting `allow_credentials=True` in `CORSMiddleware`.
+**Learning:** This is a critical security vulnerability because allowing credentials with a wildcard origin completely bypasses the browser's Same-Origin Policy (SOP), permitting any malicious site to perform authenticated requests on behalf of the user. In FastAPI, `allow_origins=["*"]` actually gets translated into allowing everything.
+**Prevention:** Read allowed origins from an environment variable (like `ALLOWED_ORIGINS`) and parse it into a specific list of trusted origins. Never use `*` when credentials are required. Default to an empty list `[]` to fail securely if the environment variable is missing.
