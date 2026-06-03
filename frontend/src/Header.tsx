@@ -48,6 +48,8 @@ export default function Header({ view, onMenu, onBack, activeConvo, overallProgr
           activeOpacity={0.8}
           onPress={view === "home" ? onMenu : onBack}
           style={styles.iconBtn}
+          accessibilityRole="button"
+          accessibilityLabel={view === "home" ? "Open Menu" : "Go Back"}
         >
           <Animated.View style={[StyleSheet.absoluteFillObject, styles.iconCenter, menuStyle]}>
             <Ic name="menu-outline" size={22} color={T.textPri} />
@@ -70,16 +72,16 @@ export default function Header({ view, onMenu, onBack, activeConvo, overallProgr
         {/* RIGHT */}
         <Animated.View style={[{ flexDirection: "row", gap: 6 }, rightStyle]}>
           {view === "home" ? (
-            <TouchableOpacity onPress={onProgressTap} activeOpacity={0.8} style={styles.rightPill}>
+            <TouchableOpacity onPress={onProgressTap} activeOpacity={0.8} style={styles.rightPill} accessibilityRole="button" accessibilityLabel={`Overall Progress: ${overallProgress}%`}>
               <CircularProgress progress={overallProgress} size={22} stroke={2.5} color={T.amber} />
               <Text style={{ color: T.amber, fontSize: 12, fontWeight: "700", fontFamily: "Courier" }}>{overallProgress}%</Text>
             </TouchableOpacity>
           ) : (
             <>
-              <TouchableOpacity onPress={onNewChat} activeOpacity={0.8} style={styles.iconBtn}>
+              <TouchableOpacity onPress={onNewChat} activeOpacity={0.8} style={styles.iconBtn} accessibilityRole="button" accessibilityLabel="New Chat">
                 <Ic name="create-outline" size={20} color={T.textPri} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={onChatMenu} activeOpacity={0.8} style={styles.iconBtn}>
+              <TouchableOpacity onPress={onChatMenu} activeOpacity={0.8} style={styles.iconBtn} accessibilityRole="button" accessibilityLabel="Chat Options">
                 <Ic name="ellipsis-horizontal" size={20} color={T.textPri} />
               </TouchableOpacity>
             </>
