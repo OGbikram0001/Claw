@@ -1,0 +1,3 @@
+## 2024-05-24 - Prevent ChatScreen re-render cascade
+**Learning:** In complex chat views with co-located state (like frequent updates to the `input` text), all list item components (`UserBubble`, `AgentBubble`, `TypingMessage`) re-render on every keystroke if not memoized. Passing large mapping objects (like `expandedTools: Record<number, boolean>`) directly as props breaks reference stability and prevents `React.memo` from working effectively.
+**Action:** Use `React.memo` on list item components and pass specific boolean primitives (`isToolExpanded={!!expandedTools[m.id]}`) instead of entire mapping objects. Additionally, use `useCallback` for event handlers passed to these components to ensure reference stability.
