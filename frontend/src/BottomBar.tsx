@@ -61,7 +61,10 @@ export default function BottomBar({ activeTab, setActiveTab, fabExpanded, setFab
           </View>
 
           {/* FAB */}
-          <TouchableOpacity onPress={() => setFabExpanded(true)} activeOpacity={0.85} style={styles.fab}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="New action"
+            onPress={() => setFabExpanded(true)} activeOpacity={0.85} style={styles.fab}>
             <View style={styles.fabInner}>
               <Ic name="add" size={24} color={T.bg} />
             </View>
@@ -76,10 +79,14 @@ function NavTab({ tab, active, onPress }: { tab: typeof TABS[number]; active: bo
   const t = useSharedValue(active ? 1 : 0);
   useEffect(() => {
     t.value = withTiming(active ? 1 : 0, { duration: 280, easing: Easing.bezier(0.32, 0.72, 0, 1) });
-  }, [active]);
+  }, [active, t]);
   const dot = useAnimatedStyle(() => ({ opacity: t.value, transform: [{ scale: t.value }] }));
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={styles.navTab}>
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={`Go to ${tab.label}`}
+      accessibilityState={{ selected: active }}
+      onPress={onPress} activeOpacity={0.7} style={styles.navTab}>
       <Ic name={(active ? tab.iconActive : tab.icon) as any} size={22} color={active ? T.amber : T.textSec} />
       <Animated.View style={[styles.activeDot, { backgroundColor: T.amber }, dot]} />
     </TouchableOpacity>
@@ -96,12 +103,18 @@ function ChatInput({ newChatText, setNewChatText, onSubmit, onClose, showClose }
   return (
     <View style={inputStyles.row}>
       {showClose && (
-        <TouchableOpacity onPress={onClose} activeOpacity={0.8} style={inputStyles.sideBtn}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+          onPress={onClose} activeOpacity={0.8} style={inputStyles.sideBtn}>
           <Ic name="close" size={20} color={T.textSec} />
         </TouchableOpacity>
       )}
       <View style={inputStyles.box}>
-        <TouchableOpacity activeOpacity={0.7} style={inputStyles.attach}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Attach file"
+          activeOpacity={0.7} style={inputStyles.attach}>
           <Ic name="attach-outline" size={18} color={T.textSec} />
         </TouchableOpacity>
         <TextInput
@@ -114,7 +127,10 @@ function ChatInput({ newChatText, setNewChatText, onSubmit, onClose, showClose }
           multiline
           style={inputStyles.input}
         />
-        <TouchableOpacity onPress={onSubmit} activeOpacity={0.8}
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Send message"
+          onPress={onSubmit} activeOpacity={0.8}
           style={[inputStyles.sendBtn, { backgroundColor: newChatText.trim() ? T.amber : T.card }]}>
           <Ic name={newChatText.trim() ? "arrow-up" : "mic-outline"} size={16} color={newChatText.trim() ? T.bg : T.textSec} />
         </TouchableOpacity>
