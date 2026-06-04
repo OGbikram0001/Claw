@@ -1,0 +1,3 @@
+## 2024-06-04 - Screen Reader Support for Icon-Only Buttons
+**Learning:** In React Native/Expo, custom icon-only buttons wrapping an icon with `TouchableOpacity` or `Pressable` are entirely invisible to screen readers without explicit accessibility attributes. The `accessibilityRole="button"` and `accessibilityLabel` must both be provided for the element to be properly identified and read out by assistive technologies like VoiceOver or TalkBack.
+**Action:** Always ensure that any custom icon-only interactive elements in the React Native frontend include these explicit accessibility attributes.
