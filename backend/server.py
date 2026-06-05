@@ -55,10 +55,14 @@ async def get_status_checks():
 # Include the router in the main app
 app.include_router(api_router)
 
+# Security Fix: Parse allowed origins from environment variable to avoid wildcard with allow_credentials=True
+allowed_origins_str = os.environ.get('ALLOWED_ORIGINS', '')
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(',')] if allowed_origins_str else []
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
