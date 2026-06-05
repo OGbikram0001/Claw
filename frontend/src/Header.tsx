@@ -45,6 +45,8 @@ export default function Header({ view, onMenu, onBack, activeConvo, overallProgr
       <View style={styles.row}>
         {/* LEFT */}
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={view === "home" ? "Open menu" : "Go back"}
           activeOpacity={0.8}
           onPress={view === "home" ? onMenu : onBack}
           style={styles.iconBtn}
@@ -70,16 +72,34 @@ export default function Header({ view, onMenu, onBack, activeConvo, overallProgr
         {/* RIGHT */}
         <Animated.View style={[{ flexDirection: "row", gap: 6 }, rightStyle]}>
           {view === "home" ? (
-            <TouchableOpacity onPress={onProgressTap} activeOpacity={0.8} style={styles.rightPill}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`Progress: ${overallProgress}%`}
+              onPress={onProgressTap}
+              activeOpacity={0.8}
+              style={styles.rightPill}
+            >
               <CircularProgress progress={overallProgress} size={22} stroke={2.5} color={T.amber} />
               <Text style={{ color: T.amber, fontSize: 12, fontWeight: "700", fontFamily: "Courier" }}>{overallProgress}%</Text>
             </TouchableOpacity>
           ) : (
             <>
-              <TouchableOpacity onPress={onNewChat} activeOpacity={0.8} style={styles.iconBtn}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="New chat"
+                onPress={onNewChat}
+                activeOpacity={0.8}
+                style={styles.iconBtn}
+              >
                 <Ic name="create-outline" size={20} color={T.textPri} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={onChatMenu} activeOpacity={0.8} style={styles.iconBtn}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Chat options"
+                onPress={onChatMenu}
+                activeOpacity={0.8}
+                style={styles.iconBtn}
+              >
                 <Ic name="ellipsis-horizontal" size={20} color={T.textPri} />
               </TouchableOpacity>
             </>
