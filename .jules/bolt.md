@@ -1,0 +1,3 @@
+## 2024-05-18 - Memoizing Lists in Complex UI
+**Learning:** In highly dynamic chat/list interfaces, frequent state updates (like `inputText` changes) on the parent component can cause devastating render cascades across all list items if components aren't memoized and props aren't stable. Specifically, passing a large dictionary object (`expandedTools`) to every item breaks `React.memo` reference equality checks.
+**Action:** Always extract specific boolean primitives (e.g. `isToolExpanded={!!expandedTools[m.id]}`) from large mapping objects before passing them to child components, and heavily utilize `useCallback` for prop handlers to preserve reference stability and ensure `React.memo` behaves correctly.
