@@ -12,7 +12,8 @@ import {
 import A2UIRenderer from "./A2UIRenderer";
 
 /* ─── USER BUBBLE ─── */
-export function UserBubble({ msg }: { msg: any }) {
+// ⚡ Bolt: Memoize component to prevent unnecessary re-renders when parent states (like input) change
+export const UserBubble = React.memo(function UserBubble({ msg }: { msg: any }) {
   return (
     <Animated.View entering={FadeInDown.duration(200)} style={{ alignItems: "flex-end", marginVertical: 6, paddingLeft: 48 }}>
       <View style={{
@@ -29,15 +30,16 @@ export function UserBubble({ msg }: { msg: any }) {
       </View>
     </Animated.View>
   );
-}
+});
 
 /* ─── AGENT MESSAGE (no bubble, full-width, icon first) ─── */
-export function AgentBubble({
-  msg, expandedTools, toggleTool, onApprove, onReject,
+// ⚡ Bolt: Memoize component and replace large mapping object with boolean primitive to preserve reference stability
+export const AgentBubble = React.memo(function AgentBubble({
+  msg, isToolExpanded, onToggleTool, onApprove, onReject,
 }: {
   msg: any;
-  expandedTools: Record<number, boolean>;
-  toggleTool: (id: number) => void;
+  isToolExpanded: boolean;
+  onToggleTool: (id: number) => void;
   onApprove: (m: any) => void;
   onReject: (m: any) => void;
 }) {
@@ -52,7 +54,7 @@ export function AgentBubble({
   if (msg.role === "tool") {
     return (
       <View style={{ marginVertical: 3, paddingLeft: 40, paddingRight: 8 }}>
-        <ToolCallBlock msg={msg} expanded={!!expandedTools[msg.id]} onToggle={() => toggleTool(msg.id)} />
+        <ToolCallBlock msg={msg} expanded={isToolExpanded} onToggle={() => onToggleTool(msg.id)} />
       </View>
     );
   }
@@ -106,7 +108,7 @@ export function AgentBubble({
       </View>
     </Animated.View>
   );
-}
+});
 
 /* ─── TYPING INDICATOR ─── */
 export function TypingMessage() {

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity,
   KeyboardAvoidingView, Platform, StyleSheet,
@@ -36,9 +36,23 @@ export default function ChatScreen() {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
   }
 
-  function toggleTool(id: number) {
+  // ⚡ Bolt: Wrap toggle handler in useCallback to maintain reference stability across re-renders
+  const toggleTool = useCallback((id: number) => {
     setExpandedTools(p => ({ ...p, [id]: !p[id] }));
-  }
+  }, []);
+
+  // ⚡ Bolt: Wrap approve/reject handlers in useCallback
+  const handleApprove = useCallback((msg: any) => {
+    setMessages(p => p.map(x =>
+      x.id === msg.id ? { ...x, role: "agent" as const, content: "✓ Approved. Deploying…" } : x
+    ));
+  }, []);
+
+  const handleReject = useCallback((msg: any) => {
+    setMessages(p => p.map(x =>
+      x.id === msg.id ? { ...x, role: "agent" as const, content: "Rejected. No changes made." } : x
+    ));
+  }, []);
 
   function handleSend(override?: string) {
     const text = (override ?? input).trim();
@@ -115,7 +129,7 @@ export default function ChatScreen() {
           { id: "btn",  component: "Button",     text: "Apply", variant: "primary" },
         ] };
       } else {
-        resp.content = `I'm on it.\n\nTry asking about: **mermaid**, **architecture**, **terminal**, **swarm**, **preview**, **research**, **search**, **automation**, **code**, or **a2ui** to see each block type.`;
+        resp.content = `I&apos;m on it.\n\nTry asking about: **mermaid**, **architecture**, **terminal**, **swarm**, **preview**, **research**, **search**, **automation**, **code**, or **a2ui** to see each block type.`;
       }
 
       setMessages(p => [...p, resp]);
@@ -170,7 +184,7 @@ export default function ChatScreen() {
                 <Ic name="sparkles-outline" size={28} color={T.amber} />
               </View>
               <Text style={s.emptyTitle}>Start the conversation</Text>
-              <Text style={s.emptySub}>Ask anything — I'll use the right tools.</Text>
+              <Text style={s.emptySub}>Ask anything — I&apos;ll use the right tools.</Text>
               {/* Quick hints */}
               <View style={s.hintsGrid}>
                 {BLOCK_HINTS.map((h, i) => (
@@ -190,14 +204,10 @@ export default function ChatScreen() {
               : <AgentBubble
                   key={m.id}
                   msg={m}
-                  expandedTools={expandedTools}
-                  toggleTool={toggleTool}
-                  onApprove={msg => setMessages(p => p.map(x =>
-                    x.id === msg.id ? { ...x, role: "agent" as const, content: "✓ Approved. Deploying…" } : x
-                  ))}
-                  onReject={msg => setMessages(p => p.map(x =>
-                    x.id === msg.id ? { ...x, role: "agent" as const, content: "Rejected. No changes made." } : x
-                  ))}
+                  isToolExpanded={!!expandedTools[m.id]}
+                  onToggleTool={toggleTool}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
                 />
           )}
 
