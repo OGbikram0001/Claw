@@ -1,0 +1,4 @@
+## 2024-06-07 - Insecure CORS and Environment Variable Handling
+**Vulnerability:** The application was using a wildcard `"*"` for CORS `allow_origins` while `allow_credentials` was `True`, and accessing environment variables unsafely with `os.environ['VAR']` which could cause application crashes.
+**Learning:** Using a wildcard for allowed origins with credentials enabled allows any origin to make authenticated requests, which is a critical security vulnerability. Direct environment variable access causes immediate failures if the variable is missing.
+**Prevention:** Always default to restrictive CORS configurations (e.g., empty list `[]`) to fail securely. Parse a strict whitelist of allowed origins from environment variables. Use `os.environ.get('VAR', 'default')` to provide secure fallback values and prevent application crashes.
