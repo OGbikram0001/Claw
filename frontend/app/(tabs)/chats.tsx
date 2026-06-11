@@ -31,6 +31,8 @@ export default function ChatsScreen() {
           activeOpacity={0.8}
           onPress={() => router.push("/chat/new" as any)}
           style={s.newBtn}
+          accessibilityRole="button"
+          accessibilityLabel="New chat"
         >
           <Ic name="add" size={18} color={T.bg} />
         </TouchableOpacity>
@@ -46,7 +48,7 @@ export default function ChatsScreen() {
           style={s.searchInput}
         />
         {!!search && (
-          <TouchableOpacity onPress={() => setSearch("")} activeOpacity={0.7}>
+          <TouchableOpacity onPress={() => setSearch("")} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel="Clear search">
             <Ic name="close-circle" size={14} color={T.textMut} />
           </TouchableOpacity>
         )}
