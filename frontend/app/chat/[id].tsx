@@ -127,7 +127,7 @@ export default function ChatScreen() {
     <View style={{ flex: 1, backgroundColor: T.bg }}>
       {/* ── TOP BAR ── */}
       <View style={s.topBar}>
-        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7} style={s.backBtn}>
+        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7} style={s.backBtn} accessibilityRole="button" accessibilityLabel="Go back">
           <Ic name="chevron-back" size={22} color={T.textPri} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
@@ -146,7 +146,7 @@ export default function ChatScreen() {
             </View>
           )}
         </View>
-        <TouchableOpacity activeOpacity={0.7} style={s.menuBtn}>
+        <TouchableOpacity activeOpacity={0.7} style={s.menuBtn} accessibilityRole="button" accessibilityLabel="Menu options">
           <Ic name="ellipsis-horizontal" size={20} color={T.textSec} />
         </TouchableOpacity>
       </View>
@@ -170,7 +170,7 @@ export default function ChatScreen() {
                 <Ic name="sparkles-outline" size={28} color={T.amber} />
               </View>
               <Text style={s.emptyTitle}>Start the conversation</Text>
-              <Text style={s.emptySub}>Ask anything — I'll use the right tools.</Text>
+              <Text style={s.emptySub}>Ask anything — I&apos;ll use the right tools.</Text>
               {/* Quick hints */}
               <View style={s.hintsGrid}>
                 {BLOCK_HINTS.map((h, i) => (
@@ -212,7 +212,7 @@ export default function ChatScreen() {
             pointerEvents="none"
           />
           <View style={s.inputBox}>
-            <TouchableOpacity activeOpacity={0.7} style={s.inputSide}>
+            <TouchableOpacity activeOpacity={0.7} style={s.inputSide} accessibilityRole="button" accessibilityLabel="Attach file">
               <Ic name="attach-outline" size={20} color={T.textSec} />
             </TouchableOpacity>
             <TextInput
@@ -230,6 +230,8 @@ export default function ChatScreen() {
               onPress={() => handleSend()}
               activeOpacity={0.8}
               style={[s.sendBtn, { backgroundColor: input.trim() ? T.amber : T.cardHi }]}
+              accessibilityRole="button"
+              accessibilityLabel={input.trim() ? "Send message" : "Record voice message"}
             >
               <Ic
                 name={input.trim() ? "arrow-up" : "mic-outline"}
