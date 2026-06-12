@@ -45,6 +45,8 @@ export default function Header({ view, onMenu, onBack, activeConvo, overallProgr
       <View style={styles.row}>
         {/* LEFT */}
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={view === "home" ? "Open Menu" : "Go Back"}
           activeOpacity={0.8}
           onPress={view === "home" ? onMenu : onBack}
           style={styles.iconBtn}
@@ -76,10 +78,10 @@ export default function Header({ view, onMenu, onBack, activeConvo, overallProgr
             </TouchableOpacity>
           ) : (
             <>
-              <TouchableOpacity onPress={onNewChat} activeOpacity={0.8} style={styles.iconBtn}>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="New Chat" onPress={onNewChat} activeOpacity={0.8} style={styles.iconBtn}>
                 <Ic name="create-outline" size={20} color={T.textPri} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={onChatMenu} activeOpacity={0.8} style={styles.iconBtn}>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Chat Menu" onPress={onChatMenu} activeOpacity={0.8} style={styles.iconBtn}>
                 <Ic name="ellipsis-horizontal" size={20} color={T.textPri} />
               </TouchableOpacity>
             </>
