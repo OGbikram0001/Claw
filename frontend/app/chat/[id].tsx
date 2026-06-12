@@ -170,7 +170,7 @@ export default function ChatScreen() {
                 <Ic name="sparkles-outline" size={28} color={T.amber} />
               </View>
               <Text style={s.emptyTitle}>Start the conversation</Text>
-              <Text style={s.emptySub}>Ask anything — I'll use the right tools.</Text>
+              <Text style={s.emptySub}>Ask anything — I&apos;ll use the right tools.</Text>
               {/* Quick hints */}
               <View style={s.hintsGrid}>
                 {BLOCK_HINTS.map((h, i) => (
