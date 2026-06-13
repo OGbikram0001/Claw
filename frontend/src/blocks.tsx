@@ -359,7 +359,7 @@ export function SearchBlock({ data }: { data: any }) {
             <View style={{ flex: 1 }}>
               <Text style={{ color: T.textPri, fontSize: 13, fontWeight: "600" }}>{r.title}</Text>
               <Text style={{ color: T.blue, fontSize: 10, fontFamily: "Courier", marginTop: 1 }}>{r.url}</Text>
-              <Text style={{ color: T.textSec, fontSize: 12.5, marginTop: 4, lineHeight: 17 }}>{r.snippet}</Text>
+              <Text style={{ color: T.textSec, fontSize: 12.5, marginTop: 4, lineHeight: 17 }} numberOfLines={2}>&quot;{r.snippet}&quot;</Text>
             </View>
           </Animated.View>
         ))}
@@ -376,7 +376,7 @@ export function DeepResearchBlock({ data }: { data: any }) {
     <Block>
       <BlockHeader icon="library-outline" label="deep research" color={T.violet}
         right={<Text style={{ color: T.violet, fontSize: 10, fontWeight: "700" }}>{data?.sources} sources</Text>} />
-      <Text style={{ color: T.textSec, fontSize: 13, fontStyle: "italic", marginTop: 6, marginBottom: 12 }}>"{data?.query}"</Text>
+      <Text style={{ color: T.textSec, fontSize: 13, fontStyle: "italic", marginTop: 6, marginBottom: 12 }}>&quot;{data?.query}&quot;</Text>
       <View style={{ gap: 10 }}>
         {(data?.steps || []).map((st: any, i: number) => (
           <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
