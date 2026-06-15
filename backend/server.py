@@ -10,14 +10,21 @@ from typing import List
 import uuid
 from datetime import datetime
 
-
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+load_dotenv(ROOT_DIR / ".env")
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[os.environ.get("DB_NAME", "testdb")]
+
+# Get allowed origins for CORS
+allowed_origins_str = os.environ.get("ALLOWED_ORIGINS", "")
+allowed_origins = (
+    [origin.strip() for origin in allowed_origins_str.split(",")]
+    if allowed_origins_str
+    else []
+)
 
 # Create the main app without a prefix
 app = FastAPI()
@@ -32,13 +39,16 @@ class StatusCheck(BaseModel):
     client_name: str
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
+
 class StatusCheckCreate(BaseModel):
     client_name: str
+
 
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
     return {"message": "Hello World"}
+
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
@@ -47,10 +57,12 @@ async def create_status_check(input: StatusCheckCreate):
     _ = await db.status_checks.insert_one(status_obj.dict())
     return status_obj
 
+
 @api_router.get("/status", response_model=List[StatusCheck])
 async def get_status_checks():
     status_checks = await db.status_checks.find().to_list(1000)
     return [StatusCheck(**status_check) for status_check in status_checks]
+
 
 # Include the router in the main app
 app.include_router(api_router)
@@ -58,17 +70,17 @@ app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
