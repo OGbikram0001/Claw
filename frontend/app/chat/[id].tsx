@@ -127,7 +127,13 @@ export default function ChatScreen() {
     <View style={{ flex: 1, backgroundColor: T.bg }}>
       {/* ── TOP BAR ── */}
       <View style={s.topBar}>
-        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7} style={s.backBtn}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          onPress={() => router.back()}
+          activeOpacity={0.7}
+          style={s.backBtn}
+        >
           <Ic name="chevron-back" size={22} color={T.textPri} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
@@ -146,7 +152,12 @@ export default function ChatScreen() {
             </View>
           )}
         </View>
-        <TouchableOpacity activeOpacity={0.7} style={s.menuBtn}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Chat options"
+          activeOpacity={0.7}
+          style={s.menuBtn}
+        >
           <Ic name="ellipsis-horizontal" size={20} color={T.textSec} />
         </TouchableOpacity>
       </View>
@@ -212,7 +223,12 @@ export default function ChatScreen() {
             pointerEvents="none"
           />
           <View style={s.inputBox}>
-            <TouchableOpacity activeOpacity={0.7} style={s.inputSide}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="Attach file"
+              activeOpacity={0.7}
+              style={s.inputSide}
+            >
               <Ic name="attach-outline" size={20} color={T.textSec} />
             </TouchableOpacity>
             <TextInput
@@ -227,6 +243,8 @@ export default function ChatScreen() {
               style={s.input}
             />
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={input.trim() ? "Send message" : "Record audio"}
               onPress={() => handleSend()}
               activeOpacity={0.8}
               style={[s.sendBtn, { backgroundColor: input.trim() ? T.amber : T.cardHi }]}
