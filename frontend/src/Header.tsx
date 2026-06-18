@@ -48,6 +48,8 @@ export default function Header({ view, onMenu, onBack, activeConvo, overallProgr
           activeOpacity={0.8}
           onPress={view === "home" ? onMenu : onBack}
           style={styles.iconBtn}
+          accessibilityRole="button"
+          accessibilityLabel={view === "home" ? "Menu" : "Back"}
         >
           <Animated.View style={[StyleSheet.absoluteFillObject, styles.iconCenter, menuStyle]}>
             <Ic name="menu-outline" size={22} color={T.textPri} />
@@ -76,10 +78,10 @@ export default function Header({ view, onMenu, onBack, activeConvo, overallProgr
             </TouchableOpacity>
           ) : (
             <>
-              <TouchableOpacity onPress={onNewChat} activeOpacity={0.8} style={styles.iconBtn}>
+              <TouchableOpacity onPress={onNewChat} activeOpacity={0.8} style={styles.iconBtn} accessibilityRole="button" accessibilityLabel="New Chat">
                 <Ic name="create-outline" size={20} color={T.textPri} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={onChatMenu} activeOpacity={0.8} style={styles.iconBtn}>
+              <TouchableOpacity onPress={onChatMenu} activeOpacity={0.8} style={styles.iconBtn} accessibilityRole="button" accessibilityLabel="Chat Menu">
                 <Ic name="ellipsis-horizontal" size={20} color={T.textPri} />
               </TouchableOpacity>
             </>
