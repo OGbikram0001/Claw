@@ -1,0 +1,3 @@
+## 2024-06-21 - Fix React re-render cascades in chat view
+**Learning:** To prevent React re-render cascades in complex list/chat views due to state co-location (e.g., highly frequent inputText updates in parent components), heavily utilize React.memo for list item components and useCallback for their prop handlers to preserve reference stability. Avoid passing large mapping objects directly as props; pass specific boolean primitives instead.
+**Action:** Use React.memo for list item components, useCallback for their prop handlers, and pass specific boolean primitives instead of large mapping objects.
