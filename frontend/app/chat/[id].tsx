@@ -36,9 +36,22 @@ export default function ChatScreen() {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
   }
 
-  function toggleTool(id: number) {
+  // ⚡ Bolt: Wrapped prop handlers in useCallback to preserve reference stability for React.memo
+  const toggleTool = React.useCallback((id: number) => {
     setExpandedTools(p => ({ ...p, [id]: !p[id] }));
-  }
+  }, []);
+
+  const handleApprove = React.useCallback((msg: any) => {
+    setMessages(p => p.map(x =>
+      x.id === msg.id ? { ...x, role: "agent" as const, content: "✓ Approved. Deploying…" } : x
+    ));
+  }, []);
+
+  const handleReject = React.useCallback((msg: any) => {
+    setMessages(p => p.map(x =>
+      x.id === msg.id ? { ...x, role: "agent" as const, content: "Rejected. No changes made." } : x
+    ));
+  }, []);
 
   function handleSend(override?: string) {
     const text = (override ?? input).trim();
@@ -170,7 +183,7 @@ export default function ChatScreen() {
                 <Ic name="sparkles-outline" size={28} color={T.amber} />
               </View>
               <Text style={s.emptyTitle}>Start the conversation</Text>
-              <Text style={s.emptySub}>Ask anything — I'll use the right tools.</Text>
+              <Text style={s.emptySub}>Ask anything — I&apos;ll use the right tools.</Text>
               {/* Quick hints */}
               <View style={s.hintsGrid}>
                 {BLOCK_HINTS.map((h, i) => (
@@ -190,14 +203,11 @@ export default function ChatScreen() {
               : <AgentBubble
                   key={m.id}
                   msg={m}
-                  expandedTools={expandedTools}
+                  // ⚡ Bolt: Pass primitive boolean instead of large mapping object
+                  isToolExpanded={!!expandedTools[m.id]}
                   toggleTool={toggleTool}
-                  onApprove={msg => setMessages(p => p.map(x =>
-                    x.id === msg.id ? { ...x, role: "agent" as const, content: "✓ Approved. Deploying…" } : x
-                  ))}
-                  onReject={msg => setMessages(p => p.map(x =>
-                    x.id === msg.id ? { ...x, role: "agent" as const, content: "Rejected. No changes made." } : x
-                  ))}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
                 />
           )}
 
