@@ -20,10 +20,10 @@ export default function FilesScreen() {
       <View style={s.header}>
         <Text style={s.title}>Files</Text>
         <View style={{ flexDirection: "row", gap: 8 }}>
-          <TouchableOpacity activeOpacity={0.8} style={s.iconBtn}>
+          <TouchableOpacity activeOpacity={0.8} style={s.iconBtn} accessibilityRole="button" accessibilityLabel="Search files">
             <Ic name="search-outline" size={16} color={T.textSec} />
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.8} style={[s.iconBtn, { backgroundColor: T.amber, borderColor: T.amber }]}>
+          <TouchableOpacity activeOpacity={0.8} style={[s.iconBtn, { backgroundColor: T.amber, borderColor: T.amber }]} accessibilityRole="button" accessibilityLabel="Upload file">
             <Ic name="cloud-upload-outline" size={16} color={T.bg} />
           </TouchableOpacity>
         </View>
@@ -97,7 +97,7 @@ export default function FilesScreen() {
                 <View style={[s.extBadge, { backgroundColor: f.color + "14" }]}>
                   <Text style={[s.extText, { color: f.color }]}>{f.ext}</Text>
                 </View>
-                <TouchableOpacity activeOpacity={0.7} style={{ padding: 4 }}>
+                <TouchableOpacity activeOpacity={0.7} style={{ padding: 4 }} accessibilityRole="button" accessibilityLabel={`File options for ${f.name}`}>
                   <Ic name="ellipsis-vertical" size={14} color={T.textMut} />
                 </TouchableOpacity>
               </TouchableOpacity>
