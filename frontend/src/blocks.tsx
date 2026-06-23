@@ -37,7 +37,7 @@ function BlockHeader({ icon, label, right, color = T.textSec }: { icon: any; lab
 /* ════════════════════════════════════════
    1. CODE BLOCK
    ════════════════════════════════════════ */
-export function CodeBlock({ code, lang = "python" }: { code: string; lang?: string }) {
+export const CodeBlock = React.memo(function CodeBlock({ code, lang = "python" }: { code: string; lang?: string }) {
   const [copied, setCopied] = useState(false);
   const onCopy = async () => {
     await Clipboard.setStringAsync(code);
@@ -49,6 +49,10 @@ export function CodeBlock({ code, lang = "python" }: { code: string; lang?: stri
     python: "logo-python", typescript: "logo-react", javascript: "logo-javascript",
     bash: "terminal-outline", go: "logo-react", rust: "code-slash-outline",
   };
+
+  // Performance optimization: memoize syntax highlighting to prevent expensive re-renders
+  // especially when typing in the ChatScreen input causes parent component updates.
+  const highlightedCode = React.useMemo(() => syntaxHighlight(code, lang), [code, lang]);
 
   return (
     <View style={s.codeWrap}>
@@ -66,12 +70,12 @@ export function CodeBlock({ code, lang = "python" }: { code: string; lang?: stri
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ padding: 14 }}>
         <Text style={s.codeText} selectable>
-          {syntaxHighlight(code, lang)}
+          {highlightedCode}
         </Text>
       </ScrollView>
     </View>
   );
-}
+});
 
 function syntaxHighlight(src: string, lang: string) {
   const PY_KW  = ["def","async","await","return","import","from","if","else","elif","for","in","print","class","with","as","lambda","try","except","True","False","None","yield","pass","raise","not","and","or","is"];
