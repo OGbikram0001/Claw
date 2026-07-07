@@ -301,12 +301,52 @@ export function SpacesView() {
   const col1 = SPACES.filter((_, i) => i % 2 === 0);
   const col2 = SPACES.filter((_, i) => i % 2 === 1);
 
-  const cardHeight = (space: typeof SPACES[number]) =>
-    space.size === "lg" ? 210 : space.size === "sm" ? 140 : 170;
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 74, paddingBottom: 110, paddingHorizontal: 12 }}>
+        {/* Header */}
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 4, paddingBottom: 10 }}>
+          <Text style={{ color: T.textPri, fontSize: 18, fontWeight: "700" }}>Spaces</Text>
+          <TouchableOpacity activeOpacity={0.8} style={{ flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: T.card, borderRadius: 20, borderWidth: 1, borderColor: T.border }}>
+            <Ic name="add" size={16} color={T.amber} />
+            <Text style={{ color: T.amber, fontSize: 13, fontWeight: "600" }}>New</Text>
+          </TouchableOpacity>
+        </View>
 
-  const SpaceCard = ({ space, idx }: { space: typeof SPACES[number]; idx: number }) => (
+        {/* Masonry 2-col */}
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <View style={{ flex: 1, gap: 10 }}>
+            {col1.map((space, i) => <SpaceCard key={space.id} space={space} idx={i * 2} />)}
+          </View>
+          <View style={{ flex: 1, gap: 10 }}>
+            {/* Create new card */}
+            <TouchableOpacity activeOpacity={0.75} style={[sp.card, { minHeight: 120, alignItems: "center", justifyContent: "center", borderStyle: "dashed", borderColor: "rgba(255,255,255,0.12)", backgroundColor: "transparent" }]}>
+              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.04)", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+                <Ic name="add" size={22} color={T.textSec} />
+              </View>
+              <Text style={{ color: T.textSec, fontSize: 14, fontWeight: "600" }}>New Space</Text>
+              <Text style={{ color: T.textMut, fontSize: 11, marginTop: 4 }}>Blank or template</Text>
+            </TouchableOpacity>
+            {col2.map((space, i) => <SpaceCard key={space.id} space={space} idx={i * 2 + 1} />)}
+          </View>
+        </View>
+      </ScrollView>
+      <ScrollFade position="top" />
+      <ScrollFade position="bottom" />
+    </View>
+  );
+}
+const sp = StyleSheet.create({
+  card: { backgroundColor: T.card, borderRadius: 18, borderWidth: 1, borderColor: T.border, padding: 14 },
+});
+
+// BOLT OPTIMIZATION: Extracted SpaceCard outside of SpacesView and wrapped with React.memo()
+// This prevents expensive unmounting/remounting of child components on every parent render
+const SpaceCard = React.memo(function SpaceCard({ space, idx }: { space: typeof SPACES[number]; idx: number }) {
+  const cardHeight = space.size === "lg" ? 210 : space.size === "sm" ? 140 : 170;
+  return (
     <Animated.View entering={FadeInDown.delay(idx * 70)}>
-      <TouchableOpacity activeOpacity={0.8} style={[sp.card, { minHeight: cardHeight(space), overflow: "hidden" }]}>
+      <TouchableOpacity activeOpacity={0.8} style={[sp.card, { minHeight: cardHeight, overflow: "hidden" }]}>
         {/* Background tint */}
         <LinearGradient
           colors={[space.color + "14", "transparent"]}
@@ -357,57 +397,21 @@ export function SpacesView() {
       </TouchableOpacity>
     </Animated.View>
   );
+});
 
-  return (
-    <View style={{ flex: 1 }}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 74, paddingBottom: 110, paddingHorizontal: 12 }}>
-        {/* Header */}
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 4, paddingBottom: 10 }}>
-          <Text style={{ color: T.textPri, fontSize: 18, fontWeight: "700" }}>Spaces</Text>
-          <TouchableOpacity activeOpacity={0.8} style={{ flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: T.card, borderRadius: 20, borderWidth: 1, borderColor: T.border }}>
-            <Ic name="add" size={16} color={T.amber} />
-            <Text style={{ color: T.amber, fontSize: 13, fontWeight: "600" }}>New</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Masonry 2-col */}
-        <View style={{ flexDirection: "row", gap: 10 }}>
-          <View style={{ flex: 1, gap: 10 }}>
-            {col1.map((space, i) => <SpaceCard key={space.id} space={space} idx={i * 2} />)}
-          </View>
-          <View style={{ flex: 1, gap: 10 }}>
-            {/* Create new card */}
-            <TouchableOpacity activeOpacity={0.75} style={[sp.card, { minHeight: 120, alignItems: "center", justifyContent: "center", borderStyle: "dashed", borderColor: "rgba(255,255,255,0.12)", backgroundColor: "transparent" }]}>
-              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.04)", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                <Ic name="add" size={22} color={T.textSec} />
-              </View>
-              <Text style={{ color: T.textSec, fontSize: 14, fontWeight: "600" }}>New Space</Text>
-              <Text style={{ color: T.textMut, fontSize: 11, marginTop: 4 }}>Blank or template</Text>
-            </TouchableOpacity>
-            {col2.map((space, i) => <SpaceCard key={space.id} space={space} idx={i * 2 + 1} />)}
-          </View>
-        </View>
-      </ScrollView>
-      <ScrollFade position="top" />
-      <ScrollFade position="bottom" />
-    </View>
-  );
-}
-const sp = StyleSheet.create({
-  card: { backgroundColor: T.card, borderRadius: 18, borderWidth: 1, borderColor: T.border, padding: 14 },
+// BOLT OPTIMIZATION: Extracted FileIcon outside of FilesView and wrapped with React.memo()
+// This prevents expensive unmounting/remounting of child components on every parent render
+const FileIcon = React.memo(function FileIcon({ ext, color }: { ext: string; color: string }) {
+  const devicon = DEVICON_MAP[ext];
+  const fallback = FILE_FALLBACK_ICON[ext] || "document-outline";
+  if (devicon) return <DiIcon name={devicon} size={22} color={color} fallback={fallback as any} />;
+  return <Ic name={fallback as any} size={22} color={color} />;
 });
 
 /* ─── FILES VIEW ─── */
 export function FilesView() {
   const [view, setView] = useState<"grid" | "list">("list");
   const totalGB = 45, maxGB = 100;
-
-  function FileIcon({ ext, color }: { ext: string; color: string }) {
-    const devicon = DEVICON_MAP[ext];
-    const fallback = FILE_FALLBACK_ICON[ext] || "document-outline";
-    if (devicon) return <DiIcon name={devicon} size={22} color={color} fallback={fallback as any} />;
-    return <Ic name={fallback as any} size={22} color={color} />;
-  }
 
   return (
     <View style={{ flex: 1 }}>
